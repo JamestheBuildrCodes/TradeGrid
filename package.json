@@ -1,0 +1,24 @@
+{
+  "name": "trade-grid",
+  "version": "1.0.0",
+  "description": "AI Trading Journal",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for static HTML'",
+    "lint": "echo 'No linter configured'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JamestheBuildrCodes/TradeGrid.git"
+  },
+  "keywords": ["trading", "journal", "analytics"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JamestheBuildrCodes/TradeGrid/issues"
+  },
+  "homepage": "https://github.com/JamestheBuildrCodes/TradeGrid#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
