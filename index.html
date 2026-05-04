@@ -3,659 +3,1411 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TradeGrid — AI Trading Journal</title>
+<title>TradeGrid — The AI Trading Journal for Serious Traders</title>
+<meta name="description" content="TradeGrid bridges the gap between institutional analysis and retail execution. Record, review, and refine your edge with AI-powered journaling.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ─── RESET ──────────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
 :root{
-  --navy:#050e1d;--navy2:#091525;--navy3:#0d1e35;--navy4:#112448;
-  --blue:#1a56db;--blue2:#2563eb;--sky:#38bdf8;--cyan:#00d4e8;
-  --white:#e8f0fe;--white2:#c8d8f8;--muted:#5a7299;--muted2:#3d5a7a;
-  --glass:rgba(255,255,255,0.03);--glass2:rgba(255,255,255,0.06);
-  --border:rgba(255,255,255,0.07);--border2:rgba(0,212,232,0.2);
-  --green:#10d98a;--red:#f0486a;--amber:#f59e0b;--purple:#a78bfa;
-  --sidebar:220px;--topbar:62px;
+  --p900:#1E0455;--p800:#2D0B6B;--p700:#4C1D95;--p600:#5B21B6;
+  --p500:#7C3AED;--p400:#8B5CF6;--p300:#A78BFA;--p200:#C4B5FD;
+  --p100:#EDE9FE;--p50:#FAF7FF;
+  --bg:#F8F9FF;--surface:#FFFFFF;
+  --on-surface:#151C27;--on-surface-2:#434655;--muted:#6B7FA8;
+  --border:#E2E8F3;--border2:#CDD3EA;
+  --green:#059669;--green-lo:#ECFDF5;--green-t:#065F46;
+  --red:#DC2626;--red-lo:#FEF2F2;
+  --amber:#D97706;--amber-lo:#FFFBEB;
+  --sh1:0 1px 3px rgba(76,29,149,.06),0 2px 8px rgba(21,28,39,.05);
+  --sh2:0 4px 20px rgba(76,29,149,.09),0 8px 32px rgba(21,28,39,.07);
+  --sh3:0 12px 48px rgba(76,29,149,.13),0 24px 64px rgba(21,28,39,.09);
+  --r1:4px;--r2:6px;--r3:10px;--r4:14px;--r5:20px;--r6:28px;
 }
-html,body{height:100%}
-body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);overflow:hidden;display:flex;cursor:none;height:100vh}
-#cur{position:fixed;z-index:9999;pointer-events:none;top:0;left:0}
-.cur-dot{position:absolute;width:6px;height:6px;background:var(--cyan);border-radius:50%;transform:translate(-50%,-50%);transition:width .15s,height .15s}
-.cur-ring{position:absolute;width:28px;height:28px;border:1px solid rgba(0,212,232,.4);border-radius:50%;transform:translate(-50%,-50%);transition:transform .1s ease,width .2s,height .2s}
-#sidebar{width:var(--sidebar);min-width:var(--sidebar);height:100vh;background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:relative;z-index:10;flex-shrink:0}
-.logo-area{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-mark svg{width:18px;height:18px}
-.logo-text{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:-.01em}
-.logo-sub{font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
-.nav-section{padding:16px 12px 0}
-.nav-label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted2);padding:0 8px;margin-bottom:8px;margin-top:8px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:.82rem;color:var(--muted);cursor:none;transition:all .2s;position:relative;margin-bottom:2px;text-decoration:none;border:1px solid transparent}
-.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
-.nav-item:hover{background:var(--glass2);color:var(--white2)}
-.nav-item.active{background:rgba(26,86,219,.15);color:var(--cyan);border-color:rgba(0,212,232,.15)}
-.nav-item.active svg{opacity:1}
-.nav-item .badge{margin-left:auto;background:var(--blue2);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:100px;font-family:'JetBrains Mono',monospace}
-.nav-item .badge.live{background:var(--red)}
-.sidebar-account{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;flex-shrink:0}
-.acc-name{font-size:.8rem;font-weight:500;line-height:1.2}
-.acc-plan{font-size:.65rem;color:var(--cyan);letter-spacing:.05em}
-#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
-#topbar{height:var(--topbar);min-height:var(--topbar);background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;z-index:9}
-.page-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-right:auto}
-.page-title span{color:var(--muted);font-weight:400;font-size:.85rem;margin-left:8px}
-.top-stat{display:flex;align-items:center;gap:6px;background:var(--glass);border:1px solid var(--border);padding:6px 12px;border-radius:8px;font-family:'JetBrains Mono',monospace}
-.top-stat-val{font-size:.82rem;font-weight:600}
-.top-stat-label{font-size:.65rem;color:var(--muted);letter-spacing:.05em}
-.add-btn{background:linear-gradient(135deg,var(--blue2),#1e40af);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;cursor:none;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(26,86,219,.4);display:flex;align-items:center;gap:6px;letter-spacing:.02em;position:relative;overflow:hidden}
-.add-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--sky),var(--cyan));opacity:0;transition:opacity .3s}
-.add-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(26,86,219,.5)}
-.add-btn:hover::before{opacity:1}
-.add-btn span{position:relative;z-index:1}
-#layout{flex:1;display:grid;grid-template-columns:1fr 336px;overflow:hidden}
-#left{display:flex;flex-direction:column;overflow-y:auto;border-right:1px solid var(--border)}
-#left::-webkit-scrollbar{width:3px}
-#left::-webkit-scrollbar-thumb{background:var(--muted2)}
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)}
-.stat-card{padding:18px 20px;border-right:1px solid var(--border);transition:background .2s}
-.stat-card:last-child{border-right:none}
-.stat-card:hover{background:var(--glass)}
-.stat-lbl{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.stat-num{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:600;line-height:1;margin-bottom:4px}
-.stat-sub{font-size:.65rem;color:var(--muted)}
-.pos-c{color:var(--green)}.neg-c{color:var(--red)}.sky-c{color:var(--sky)}.amb-c{color:var(--amber)}
-.sec-hdr{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.sec-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700}
-.ctrl-grp{display:flex;gap:5px}
-.cbtn{background:var(--glass);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:.68rem;cursor:none;transition:all .2s;font-family:'DM Sans',sans-serif}
-.cbtn:hover,.cbtn.on{background:rgba(26,86,219,.2);border-color:var(--border2);color:var(--cyan)}
-.cal-wrap{padding:14px 20px}
-.cal-head{display:grid;grid-template-columns:repeat(7,1fr) 84px;gap:3px;margin-bottom:3px}
-.cal-dl{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);text-align:center;padding:4px 0}
-.cal-row{display:grid;grid-template-columns:repeat(7,1fr) 84px;gap:3px;margin-bottom:3px}
-.cal-cell{background:var(--glass);border:1px solid var(--border);border-radius:6px;padding:5px 6px;min-height:68px;transition:all .22s;cursor:none;display:flex;flex-direction:column}
-.cal-cell:hover{background:var(--glass2);border-color:rgba(255,255,255,.12);transform:scale(1.015);z-index:2}
-.cal-cell.empty{background:transparent;border-color:transparent}
-.cal-cell.empty:hover{transform:none}
-.cal-cell.wknd{opacity:.45}
-.cal-cell.gp{border-color:rgba(16,217,138,.22);background:rgba(16,217,138,.035)}
-.cal-cell.rp{border-color:rgba(240,72,106,.22);background:rgba(240,72,106,.035)}
-.cal-cell.today-c{border-color:rgba(0,212,232,.4)!important;background:rgba(0,212,232,.06)!important}
-.cal-date{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted2);margin-bottom:3px}
-.cal-cell.today-c .cal-date{color:var(--cyan);font-weight:600}
-.cal-t{font-size:.55rem;font-family:'JetBrains Mono',monospace;padding:2px 4px;border-radius:3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-.cal-t.gp{background:rgba(16,217,138,.14);color:var(--green)}
-.cal-t.rp{background:rgba(240,72,106,.14);color:var(--red)}
-.cal-t.be{background:rgba(255,255,255,.06);color:var(--muted)}
-.wk-tot{background:var(--glass);border:1px solid var(--border);border-radius:6px;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.wt-v{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600}
-.wt-l{font-size:.52rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.wk-tot.gp .wt-v{color:var(--green)}
-.wk-tot.rp .wt-v{color:var(--red)}
-.trd-sec{padding:14px 20px 20px}
-.trd-tbl{width:100%;border-collapse:collapse}
-.trd-tbl th{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 8px 9px;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
-.trd-tbl td{padding:9px 8px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.73rem}
-.trd-tbl tr:last-child td{border-bottom:none}
-.trd-tbl tr:hover td{background:var(--glass)}
-.trd-tbl tr{cursor:none;transition:all .15s}
-.pbadge{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700}
-.dbadge{font-size:.55rem;letter-spacing:.1em;padding:2px 6px;border-radius:100px;font-family:'DM Sans',sans-serif;font-weight:600}
-.dbadge.b{background:rgba(16,217,138,.15);color:var(--green)}
-.dbadge.s{background:rgba(240,72,106,.15);color:var(--red)}
-.grade{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;font-family:'Syne',sans-serif;font-size:.62rem;font-weight:800}
-.ga{background:rgba(16,217,138,.2);color:var(--green)}.gb{background:rgba(245,158,11,.2);color:var(--amber)}.gc{background:rgba(240,72,106,.2);color:var(--red)}
-#right{display:flex;flex-direction:column;background:var(--navy2);overflow-y:auto}
-#right::-webkit-scrollbar{width:3px}
-#right::-webkit-scrollbar-thumb{background:var(--muted2)}
-.ai-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.ai-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--amber),#f97316);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
-.ai-av::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--navy2)}
-.ai-av svg{width:18px;height:18px}
-.ai-nm{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700}
-.ai-st{font-size:.62rem;color:var(--green)}
-.ai-mode{margin-left:auto;background:var(--glass);border:1px solid var(--border);padding:4px 8px;border-radius:6px;font-size:.6rem;color:var(--muted);cursor:none;font-family:'DM Sans',sans-serif;transition:all .2s}
-.ai-mode:hover{border-color:var(--border2);color:var(--cyan)}
-.msgs{flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:320px}
-.msgs::-webkit-scrollbar{width:2px}
-.msgs::-webkit-scrollbar-thumb{background:var(--muted2)}
-.msg{display:flex;flex-direction:column;gap:3px;animation:mIn .3s ease}
-@keyframes mIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.mb{padding:9px 11px;border-radius:10px;font-size:.74rem;line-height:1.6;max-width:92%}
-.msg.ai .mb{background:var(--glass2);border:1px solid var(--border);border-radius:2px 10px 10px 10px;color:var(--white2)}
-.msg.usr .mb{background:rgba(26,86,219,.25);border:1px solid rgba(26,86,219,.3);border-radius:10px 2px 10px 10px;color:var(--white);align-self:flex-end}
-.mt{font-size:.52rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
-.msg.usr .mt{align-self:flex-end}
-.ins-card{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:9px 11px;margin-top:3px}
-.ins-ttl{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:5px;font-family:'Syne',sans-serif;font-weight:700}
-.ins-i{font-size:.7rem;color:var(--white2);line-height:1.6;display:flex;gap:5px;margin-bottom:2px}
-.ins-i::before{content:'→';color:var(--amber);flex-shrink:0}
-.typing{display:flex;align-items:center;gap:3px;padding:8px 11px;background:var(--glass2);border:1px solid var(--border);border-radius:10px;width:fit-content}
-.typing span{width:5px;height:5px;background:var(--muted);border-radius:50%;animation:blk 1.2s infinite}
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-@keyframes blk{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
-.pills{padding:0 16px 8px;display:flex;gap:5px;flex-wrap:wrap}
-.pill{background:var(--glass);border:1px solid var(--border);padding:4px 9px;border-radius:100px;font-size:.65rem;color:var(--muted);cursor:none;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.pill:hover{background:rgba(26,86,219,.15);border-color:var(--border2);color:var(--cyan)}
-.ai-inp-row{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px}
-.ai-inp{flex:1;background:var(--glass);border:1px solid var(--border);padding:8px 11px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.76rem;color:var(--white);outline:none;transition:border-color .2s;cursor:none}
-.ai-inp:focus{border-color:var(--border2)}
-.ai-inp::placeholder{color:var(--muted2)}
-.ai-send{width:31px;height:31px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border:none;border-radius:8px;cursor:none;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;flex-shrink:0}
-.ai-send:hover{transform:scale(1.06);box-shadow:0 4px 12px rgba(0,212,232,.3)}
+body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--on-surface);overflow-x:hidden;cursor:none}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit;cursor:none}
+
+/* ─── CURSOR ─────────────────────────────────────────────────────────── */
+#cur{position:fixed;top:0;left:0;z-index:99999;pointer-events:none}
+.cur-d{position:absolute;width:6px;height:6px;background:var(--p500);border-radius:50%;transform:translate(-50%,-50%);transition:width .15s,height .15s}
+.cur-r{position:absolute;width:24px;height:24px;border:1.5px solid rgba(124,58,237,.35);border-radius:50%;transform:translate(-50%,-50%);transition:width .2s,height .2s}
+body:has(a:hover) .cur-d,body:has(button:hover) .cur-d{width:12px;height:12px}
+body:has(a:hover) .cur-r,body:has(button:hover) .cur-r{width:40px;height:40px}
+
+/* ─── LAYOUT HELPERS ─────────────────────────────────────────────────── */
+.container{max-width:1180px;margin:0 auto;padding:0 32px}
+.section{padding:96px 0}
+.section-sm{padding:64px 0}
+
+/* ─── TYPOGRAPHY ─────────────────────────────────────────────────────── */
+.serif{font-family:'Noto Serif',serif}
+.mono{font-family:'JetBrains Mono',monospace}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--p500);margin-bottom:12px}
+h1{font-family:'Noto Serif',serif;font-size:clamp(2.4rem,5vw,3.6rem);font-weight:700;line-height:1.08;letter-spacing:-.03em;color:var(--on-surface)}
+h2{font-family:'Noto Serif',serif;font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;line-height:1.1;letter-spacing:-.025em;color:var(--on-surface)}
+h3{font-family:'Noto Serif',serif;font-size:1.25rem;font-weight:600;line-height:1.3;color:var(--on-surface)}
+.lead{font-size:1.05rem;line-height:1.75;color:var(--muted);font-weight:400}
+.text-purple{color:var(--p500)}
+.text-purple-italic{font-style:italic;color:var(--p500)}
+
+/* ─── BUTTONS ────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--r2);font-family:'Manrope',sans-serif;font-size:.88rem;font-weight:700;cursor:none;border:none;transition:all .2s;letter-spacing:.01em;white-space:nowrap}
+.btn-primary{background:var(--p500);color:#fff;box-shadow:0 3px 12px rgba(124,58,237,.35)}
+.btn-primary:hover{background:var(--p600);box-shadow:0 5px 20px rgba(124,58,237,.45);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--on-surface-2)}
+.btn-outline:hover{border-color:var(--p400);color:var(--p500);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);padding:10px 16px}
+.btn-ghost:hover{color:var(--p500)}
+.btn-lg{padding:14px 28px;font-size:.95rem}
+.btn-sm{padding:8px 16px;font-size:.78rem}
+.btn-white{background:#fff;color:var(--p600);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.btn-white:hover{background:var(--p50);transform:translateY(-1px)}
+
+/* ─── STICKY NAV ─────────────────────────────────────────────────────── */
+#nav{position:fixed;top:0;width:100%;z-index:1000;transition:all .35s}
+#nav.scrolled{background:rgba(255,255,255,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);box-shadow:var(--sh1)}
+.nav-inner{height:64px;display:flex;align-items:center;gap:0}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:32px}
+.nav-logo-text{font-family:'Noto Serif',serif;font-size:1rem;font-weight:700;color:var(--p500)}
+.nav-links{display:flex;gap:0;list-style:none;height:64px;align-items:stretch}
+.nav-item{position:relative;height:100%;display:flex;align-items:center}
+.nav-link{padding:0 16px;font-size:.85rem;font-weight:600;color:var(--on-surface-2);height:100%;display:flex;align-items:center;gap:4px;transition:color .18s;cursor:none}
+.nav-link:hover,.nav-link.active{color:var(--p500)}
+.nav-link svg{width:14px;height:14px;transition:transform .2s}
+.nav-item:hover .nav-link svg{transform:rotate(180deg)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* Mega dropdown */
+.nav-dropdown{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border);border-radius:var(--r4);box-shadow:var(--sh3);padding:20px;min-width:560px;display:none;z-index:999}
+.nav-item:hover .nav-dropdown{display:block;animation:dropIn .2s ease}
+@keyframes dropIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.dd-item{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:var(--r3);transition:background .15s;cursor:none}
+.dd-item:hover{background:var(--p50)}
+.dd-icon{width:36px;height:36px;border-radius:8px;background:var(--p100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dd-icon svg{width:16px;height:16px;color:var(--p500)}
+.dd-title{font-size:.84rem;font-weight:700;color:var(--on-surface);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.dd-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+.dd-badge{font-size:.58rem;font-weight:700;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:1px 6px;letter-spacing:.06em;text-transform:uppercase}
+.dd-badge.soon{background:var(--amber-lo);color:var(--amber)}
+
+/* ─── HERO ───────────────────────────────────────────────────────────── */
+#hero{padding:140px 0 80px;position:relative;overflow:hidden;background:var(--bg)}
+#hero::before{content:'';position:absolute;top:-200px;right:-100px;width:700px;height:700px;background:radial-gradient(ellipse,rgba(124,58,237,.07) 0%,transparent 65%);pointer-events:none}
+#hero::after{content:'';position:absolute;bottom:-100px;left:-100px;width:500px;height:500px;background:radial-gradient(ellipse,rgba(76,29,149,.05) 0%,transparent 65%);pointer-events:none}
+.hero-inner{display:grid;grid-template-columns:1fr 1.1fr;gap:64px;align-items:center;position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:var(--p100);border:1px solid rgba(124,58,237,.2);border-radius:100px;padding:5px 14px;font-size:.72rem;font-weight:700;color:var(--p600);letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.6)}}
+.hero-h1{margin-bottom:18px}
+.hero-h1 em{font-style:italic;color:var(--p500)}
+.hero-sub{margin-bottom:30px;max-width:460px}
+.hero-btns{display:flex;gap:10px;align-items:center;margin-bottom:32px}
+.hero-social-proof{display:flex;align-items:center;gap:14px}
+.proof-avatars{display:flex}
+.proof-av{width:28px;height:28px;border-radius:50%;border:2px solid #fff;margin-left:-9px;background:linear-gradient(135deg,#4C1D95,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;overflow:hidden}
+.proof-av:first-child{margin-left:0}
+.proof-text{font-size:.78rem;color:var(--muted);line-height:1.4}
+.proof-text strong{color:var(--on-surface);font-weight:700}
+.hero-stars{color:#F59E0B;font-size:.75rem;margin-bottom:2px}
+
+/* Hero mockup */
+.hero-visual{position:relative}
+.hero-card{background:#fff;border:1px solid var(--border);border-radius:var(--r5);box-shadow:var(--sh3);overflow:hidden}
+.hero-card-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:7px}
+.hcb-dot{width:9px;height:9px;border-radius:50%}
+.hcb-url{flex:1;background:#fff;border:1px solid var(--border);border-radius:100px;padding:3px 12px;font-size:.66rem;font-family:'JetBrains Mono',monospace;color:var(--muted);text-align:center;max-width:200px;margin:0 auto}
+.hero-card-body{padding:18px}
+.hcb-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.hcb-stat{background:var(--bg);border-radius:var(--r3);padding:12px 10px;text-align:center}
+.hcb-stat-lbl{font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.hcb-stat-val{font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700}
+.hcb-chart-wrap{background:var(--bg);border-radius:var(--r3);padding:12px;margin-bottom:12px}
+.hcb-chart-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.hcb-ai-box{background:var(--p50);border:1px solid rgba(124,58,237,.15);border-radius:var(--r2);padding:11px}
+.hcb-ai-header{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.hcb-ai-tag{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p500)}
+.hcb-ai-text{font-size:.73rem;color:var(--on-surface-2);line-height:1.6;font-style:italic}
+/* Floating cards */
+.hero-float{position:absolute;background:#fff;border:1px solid var(--border);border-radius:var(--r3);padding:12px 14px;box-shadow:var(--sh2)}
+.hero-float-1{top:-20px;right:-24px;min-width:160px}
+.hero-float-2{bottom:-16px;left:-24px;min-width:180px}
+.hf-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.hf-val{font-family:'Noto Serif',serif;font-size:1.3rem;font-weight:700}
+.hf-sub{font-size:.7rem;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:2px}
+.pos{color:var(--green)}.neg{color:var(--red)}.neutral{color:var(--p500)}
+
+/* ─── TRUSTED BY ─────────────────────────────────────────────────────── */
+#trusted{padding:32px 0 48px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff}
+.trusted-inner{display:flex;align-items:center;gap:32px}
+.trusted-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;padding-right:32px;border-right:1px solid var(--border)}
+.trusted-logos{display:flex;align-items:center;gap:36px;flex:1}
+.trusted-logo{display:flex;align-items:center;gap:8px;opacity:.45;transition:opacity .2s;cursor:none}
+.trusted-logo:hover{opacity:.75}
+.trusted-logo-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4C1D95,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:800;color:#fff;flex-shrink:0}
+.trusted-logo-name{font-size:.82rem;font-weight:700;color:var(--on-surface)}
+.trustpilot{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tp-stars{color:#00B67A;font-size:.8rem}
+.tp-text{font-size:.75rem;font-weight:700;color:var(--on-surface)}
+.tp-sub{font-size:.65rem;color:var(--muted)}
+
+/* ─── FEATURE TABS ───────────────────────────────────────────────────── */
+#features{padding:80px 0;background:#fff}
+.feat-tabs-header{text-align:center;margin-bottom:40px}
+.feat-tabs-nav{display:flex;align-items:center;justify-content:center;gap:0;border-bottom:2px solid var(--border);margin-bottom:48px;overflow-x:auto}
+.feat-tab{display:flex;align-items:center;gap:7px;padding:14px 22px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:none;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .18s}
+.feat-tab svg{width:16px;height:16px;opacity:.6}
+.feat-tab:hover{color:var(--on-surface)}
+.feat-tab.active{color:var(--p500);border-bottom-color:var(--p500)}
+.feat-tab.active svg{opacity:1}
+.feat-panel{display:none}
+.feat-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.feat-panel-text h2{margin-bottom:14px}
+.feat-panel-text .lead{margin-bottom:24px}
+.feat-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.feat-item{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;line-height:1.6;color:var(--on-surface-2)}
+.feat-item-icon{width:20px;height:20px;border-radius:50%;background:var(--green-lo);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.feat-item-icon svg{width:10px;height:10px;color:var(--green)}
+.feat-visual{background:var(--bg);border:1px solid var(--border);border-radius:var(--r4);overflow:hidden;box-shadow:var(--sh2)}
+.fv-bar{background:#fff;border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:6px}
+.fv-dot{width:8px;height:8px;border-radius:50%}
+.fv-body{padding:16px}
+
+/* ─── DEEP FEATURE SECTIONS ──────────────────────────────────────────── */
+.feature-section{padding:96px 0;position:relative;overflow:hidden}
+.feature-section.alt{background:#fff}
+.feature-section.dark{background:var(--p900);color:#fff}
+.feature-section.dark h2{color:#fff}
+.feature-section.dark .lead{color:rgba(255,255,255,.6)}
+.feature-section.dark .eyebrow{color:var(--p300)}
+.fs-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.fs-inner.flip{direction:rtl}
+.fs-inner.flip>*{direction:ltr}
+.fs-text h2{margin-bottom:14px}
+.fs-text .lead{margin-bottom:28px}
+.fs-visual-wrap{position:relative}
+.fs-card{background:#fff;border:1px solid var(--border);border-radius:var(--r5);box-shadow:var(--sh3);overflow:hidden}
+.fs-card.dark-bg{background:var(--p900);border-color:rgba(255,255,255,.08)}
+.fs-pill{display:inline-flex;align-items:center;gap:6px;background:var(--green-lo);border-radius:100px;padding:5px 12px;font-size:.72rem;font-weight:700;color:var(--green-t);margin-bottom:14px}
+.fs-pill svg{width:12px;height:12px;color:var(--green)}
+.fs-pill.purple{background:var(--p100);color:var(--p600)}
+.fs-pill.purple svg{color:var(--p500)}
+/* Feature points */
+.fs-points{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.fs-point{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:var(--r3);border:1px solid var(--border);background:#fff;transition:all .2s}
+.fs-point:hover{border-color:var(--p200);box-shadow:var(--sh1)}
+.fs-point-icon{width:38px;height:38px;border-radius:9px;background:var(--p100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fs-point-icon svg{width:17px;height:17px;color:var(--p500)}
+.fs-point h4{font-family:'Noto Serif',serif;font-size:.92rem;font-weight:600;color:var(--on-surface);margin-bottom:3px}
+.fs-point p{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* ─── AI COACH SECTION ───────────────────────────────────────────────── */
+#ai-section{padding:96px 0;background:linear-gradient(135deg,var(--p900) 0%,#2D0B6B 40%,#4C1D95 100%);position:relative;overflow:hidden}
+#ai-section::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(124,58,237,.3) 1px,transparent 1px);background-size:32px 32px;opacity:.15;pointer-events:none}
+#ai-section::after{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;background:radial-gradient(ellipse,rgba(167,139,250,.15) 0%,transparent 65%);pointer-events:none}
+.ai-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:1}
+.ai-text h2{color:#fff;margin-bottom:14px}
+.ai-text .lead{color:rgba(255,255,255,.6);margin-bottom:28px}
+.ai-text .eyebrow{color:var(--p300)}
+.ai-features{display:flex;flex-direction:column;gap:14px}
+.ai-feat{display:flex;align-items:flex-start;gap:14px;padding:16px;border-radius:var(--r3);border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:all .2s;cursor:none}
+.ai-feat:hover{border-color:rgba(167,139,250,.3);background:rgba(255,255,255,.07)}
+.ai-feat-icon{width:38px;height:38px;border-radius:9px;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-feat-icon svg{width:17px;height:17px;color:var(--p300)}
+.ai-feat h4{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:3px}
+.ai-feat p{font-size:.79rem;color:rgba(255,255,255,.55);line-height:1.6}
+/* AI chat demo */
+.ai-demo{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--r4);overflow:hidden}
+.ai-demo-header{background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.08);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.ai-av{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#D97706,#F97316);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.ai-av::after{content:'';position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:#34D399;border-radius:50%;border:1.5px solid rgba(30,4,85,1)}
+.ai-av svg{width:14px;height:14px;color:#fff}
+.ai-nm{font-size:.82rem;font-weight:700;color:#fff}
+.ai-st{font-size:.6rem;color:#34D399}
+.ai-msgs{padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:hidden}
+.ai-msg{padding:9px 12px;border-radius:10px;font-size:.77rem;line-height:1.65}
+.ai-msg.bot{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.8);border-radius:2px 10px 10px 10px;max-width:90%}
+.ai-msg.user{background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.35);color:#fff;border-radius:10px 2px 10px 10px;align-self:flex-end;max-width:85%}
+.ai-insight-card{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px}
+.ai-insight-title{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F59E0B;margin-bottom:5px}
+.ai-insight-item{font-size:.72rem;color:rgba(255,255,255,.7);line-height:1.6;display:flex;gap:5px;margin-bottom:2px}
+.ai-insight-item::before{content:'→';color:#F59E0B;flex-shrink:0;font-size:.68rem}
+.ai-inp{padding:10px 14px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:7px;align-items:center}
+.ai-inp input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:7px 11px;font-family:'Manrope',sans-serif;font-size:.76rem;color:rgba(255,255,255,.5);outline:none}
+.ai-send{width:30px;height:30px;background:var(--p500);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:none}
 .ai-send svg{width:13px;height:13px;color:#fff}
-.mini-sec{padding:14px 18px;border-top:1px solid var(--border)}
-.mini-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.pair-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
-.pr-row{display:flex;align-items:center;gap:8px}
-.pr-nm{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;width:56px;flex-shrink:0}
-.pr-bg{flex:1;height:5px;background:var(--glass);border-radius:3px;overflow:hidden}
-.pr-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
-.pr-fill.gp{background:linear-gradient(90deg,var(--green),rgba(16,217,138,.3))}
-.pr-fill.rp{background:linear-gradient(90deg,var(--red),rgba(240,72,106,.3))}
-.pr-rr{font-family:'JetBrains Mono',monospace;font-size:.66rem;width:36px;text-align:right;flex-shrink:0}
-.pr-rr.gp{color:var(--green)}.pr-rr.rp{color:var(--red)}
-.ftmo-card{margin:12px 18px;background:linear-gradient(135deg,rgba(26,86,219,.1),rgba(0,212,232,.05));border:1px solid rgba(0,212,232,.18);border-radius:10px;padding:12px 14px}
-.ftmo-ttl{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.ftmo-nm{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700}
-.ftmo-phase{font-size:.6rem;background:rgba(0,212,232,.15);color:var(--cyan);padding:3px 8px;border-radius:100px;border:1px solid rgba(0,212,232,.2)}
-.prog-row{margin-bottom:6px}
-.prog-labels{display:flex;justify-content:space-between;margin-bottom:3px;font-size:.6rem}
-.prog-bar{height:4px;background:var(--glass);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;border-radius:2px;transition:width 1.5s .4s cubic-bezier(.16,1,.3,1)}
-.modal-ov{position:fixed;inset:0;background:rgba(5,14,29,.88);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center}
-.modal-ov.open{display:flex}
-.modal{background:var(--navy3);border:1px solid var(--border);border-radius:16px;width:500px;overflow:hidden;animation:mUp .3s cubic-bezier(.16,1,.3,1)}
-@keyframes mUp{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.m-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.m-ttl{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700}
-.m-close{background:var(--glass);border:1px solid var(--border);width:26px;height:26px;border-radius:6px;cursor:none;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .2s;font-size:13px}
-.m-close:hover{background:rgba(240,72,106,.15);border-color:var(--red);color:var(--red)}
-.m-body{padding:18px 22px}
-.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.fg{display:flex;flex-direction:column;gap:4px}
-.fg.full{grid-column:1/-1}
-.fl{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.fi{background:var(--glass);border:1px solid var(--border);padding:7px 11px;border-radius:8px;color:var(--white);font-family:'JetBrains Mono',monospace;font-size:.78rem;outline:none;transition:border-color .2s;cursor:none;width:100%}
-.fi:focus{border-color:var(--border2)}
-.emo-row{display:flex;gap:5px;margin-bottom:10px}
-.ebo{flex:1;padding:6px 3px;border-radius:8px;border:1px solid var(--border);background:var(--glass);font-size:.62rem;cursor:none;color:var(--muted);transition:all .2s;text-align:center;line-height:1.4}
-.ebo:hover,.ebo.on{border-color:var(--border2);background:rgba(0,212,232,.07);color:var(--cyan)}
-.m-sub{width:100%;padding:10px;margin-top:3px;background:linear-gradient(135deg,var(--blue2),#1e40af);color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;cursor:none;letter-spacing:.03em;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(26,86,219,.4)}
-.m-sub:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(26,86,219,.5)}
-@keyframes fIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.stat-card{animation:fIn .5s ease both}
-.stat-card:nth-child(1){animation-delay:.05s}
-.stat-card:nth-child(2){animation-delay:.1s}
-.stat-card:nth-child(3){animation-delay:.15s}
-.stat-card:nth-child(4){animation-delay:.2s}
-.stat-card:nth-child(5){animation-delay:.25s}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--muted2);border-radius:2px}
+
+/* ─── CALENDAR SECTION ───────────────────────────────────────────────── */
+#calendar-section{padding:96px 0;background:var(--bg)}
+.cal-section-inner{display:grid;grid-template-columns:1.1fr 1fr;gap:72px;align-items:center}
+.cal-card{background:#fff;border:1px solid var(--border);border-radius:var(--r5);box-shadow:var(--sh3);overflow:hidden}
+.cal-header{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.cal-title-row{display:flex;align-items:center;gap:8px}
+.cal-title-row span{font-family:'Noto Serif',serif;font-size:.88rem;font-weight:600}
+.cal-month{font-family:'JetBrains Mono',monospace;font-size:.78rem;font-weight:600;color:var(--muted)}
+.cal-tabs{display:flex;gap:4px}
+.cal-tab{padding:4px 9px;border-radius:var(--r1);font-size:.68rem;font-weight:700;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:none;transition:all .18s}
+.cal-tab.on{background:var(--p500);border-color:var(--p500);color:#fff}
+.cal-body{padding:14px}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-dl{font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;padding:3px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-cell{border:1px solid var(--border);border-radius:var(--r1);padding:6px 7px;min-height:52px;display:flex;flex-direction:column;transition:all .18s;cursor:none}
+.cal-cell:hover{border-color:var(--p300)}
+.cal-cell.pos{background:rgba(5,150,105,.04);border-color:rgba(5,150,105,.18)}
+.cal-cell.neg{background:rgba(220,38,38,.04);border-color:rgba(220,38,38,.15)}
+.cal-cell.empty{border-color:transparent;background:transparent}
+.cal-date-num{font-size:.6rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+.cal-rr{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;margin-top:auto}
+.cal-rr.pos{color:var(--green)}.cal-rr.neg{color:var(--red)}.cal-rr.be{color:var(--muted)}
+.cal-bar{height:2px;border-radius:2px;margin-top:3px}
+.cal-bar.pos{background:var(--green)}.cal-bar.neg{background:var(--red)}
+
+/* ─── BROKERS ────────────────────────────────────────────────────────── */
+#brokers{padding:80px 0;background:#fff}
+.broker-intro{text-align:center;margin-bottom:48px}
+.broker-logos{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.broker-pill{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg);border:1px solid var(--border);border-radius:100px;font-size:.8rem;font-weight:600;color:var(--on-surface-2);transition:all .2s;cursor:none}
+.broker-pill:hover{border-color:var(--p300);background:var(--p50);color:var(--p500)}
+.broker-pill-icon{width:22px;height:22px;border-radius:5px;background:var(--p100);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:var(--p600)}
+
+/* ─── PROP FIRM SECTION ──────────────────────────────────────────────── */
+#propfirm{padding:96px 0;background:var(--bg)}
+.prop-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.prop-card{background:#fff;border:1px solid var(--border);border-radius:var(--r5);padding:24px;box-shadow:var(--sh2)}
+.prop-card-header{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.prop-badge{display:inline-flex;align-items:center;gap:5px;background:var(--p100);border-radius:100px;padding:4px 10px;font-size:.65rem;font-weight:700;color:var(--p600);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.prop-account{font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700;margin-bottom:3px}
+.prop-sub{font-size:.75rem;color:var(--muted)}
+.prop-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.prop-stat{padding:12px;background:var(--bg);border-radius:var(--r3)}
+.prop-stat-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.prop-stat-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700}
+.progress-row{margin-bottom:12px}
+.progress-labels{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:5px}
+.progress-key{font-weight:600;color:var(--on-surface-2)}
+.progress-val{font-family:'JetBrains Mono',monospace;font-weight:700}
+.progress-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.progress-fill{height:100%;border-radius:3px;transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+
+/* ─── TESTIMONIALS ───────────────────────────────────────────────────── */
+#testimonials{padding:96px 0;background:#fff}
+.testi-intro{text-align:center;margin-bottom:52px}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.testi-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r4);padding:24px;transition:all .22s;cursor:none}
+.testi-card:hover{border-color:var(--p200);box-shadow:var(--sh2);transform:translateY(-3px)}
+.testi-stars{color:#F59E0B;font-size:.85rem;margin-bottom:14px}
+.testi-text{font-size:.86rem;line-height:1.75;color:var(--on-surface-2);margin-bottom:18px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--p700),var(--p400));display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#fff;flex-shrink:0}
+.testi-name{font-size:.88rem;font-weight:700;color:var(--on-surface)}
+.testi-role{font-size:.73rem;color:var(--muted);margin-top:1px}
+
+/* ─── PRICING ────────────────────────────────────────────────────────── */
+#pricing{padding:96px 0;background:var(--bg)}
+.pricing-intro{text-align:center;margin-bottom:52px}
+.price-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.price-card{background:#fff;border:1px solid var(--border);border-radius:var(--r4);padding:24px;display:flex;flex-direction:column;transition:all .22s}
+.price-card:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.price-card.pop{background:var(--p900);border-color:var(--p900);color:#fff}
+.price-card.founder{border-color:rgba(124,58,237,.35);background:linear-gradient(135deg,rgba(76,29,149,.05),rgba(124,58,237,.03))}
+.price-pop-badge{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;background:var(--p300);color:var(--p900);border-radius:100px;padding:3px 9px;margin-bottom:14px;letter-spacing:.06em}
+.price-tier{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.price-card.pop .price-tier{color:rgba(255,255,255,.45)}
+.price-card.founder .price-tier{color:var(--p500)}
+.price-amount{font-family:'Noto Serif',serif;font-size:2rem;font-weight:700;color:var(--on-surface);line-height:1;margin-bottom:4px}
+.price-amount sup{font-size:1rem;vertical-align:super}
+.price-amount .mo{font-size:.9rem;font-weight:400;color:var(--muted)}
+.price-card.pop .price-amount{color:#fff}
+.price-card.pop .price-amount .mo{color:rgba(255,255,255,.4)}
+.price-card.founder .price-amount{color:var(--p500)}
+.price-desc{font-size:.79rem;color:var(--muted);margin-bottom:18px;line-height:1.6;flex-shrink:0}
+.price-card.pop .price-desc{color:rgba(255,255,255,.5)}
+.price-features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;flex:1}
+.pf-item{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--on-surface-2)}
+.pf-item.off{color:var(--muted);opacity:.5}
+.pf-icon{width:15px;height:15px;flex-shrink:0}
+.pf-icon.on{color:var(--green)}
+.pf-icon.off-c{color:var(--muted)}
+.price-card.pop .pf-item{color:rgba(255,255,255,.8)}
+.price-card.pop .pf-icon.on{color:#34D399}
+.price-card.founder .pf-icon.on{color:var(--p400)}
+.price-btn{width:100%;padding:11px;border-radius:var(--r2);font-family:'Manrope',sans-serif;font-size:.85rem;font-weight:700;cursor:none;border:none;transition:all .2s;text-align:center}
+.price-btn-free{background:var(--bg);border:1.5px solid var(--border2);color:var(--on-surface-2)}
+.price-btn-free:hover{border-color:var(--p400);color:var(--p500)}
+.price-btn-pro{background:var(--p300);color:var(--p900)}
+.price-btn-pro:hover{background:var(--p200)}
+.price-btn-elite{background:transparent;border:1.5px solid var(--border2);color:var(--on-surface-2)}
+.price-btn-elite:hover{border-color:var(--p400);color:var(--p500)}
+.price-btn-founder{background:var(--p500);color:#fff;box-shadow:0 3px 12px rgba(124,58,237,.35)}
+.price-btn-founder:hover{background:var(--p600)}
+.pricing-note{text-align:center;font-size:.78rem;color:var(--muted);margin-top:18px}
+.pricing-note strong{color:var(--amber);font-weight:700}
+
+/* ─── FAQ ────────────────────────────────────────────────────────────── */
+#faq{padding:96px 0;background:#fff}
+.faq-intro{text-align:center;margin-bottom:52px}
+.faq-list{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:20px 0;cursor:none;font-size:.92rem;font-weight:600;color:var(--on-surface);gap:16px;transition:color .18s}
+.faq-q:hover{color:var(--p500)}
+.faq-q svg{width:18px;height:18px;flex-shrink:0;color:var(--muted);transition:transform .25s}
+.faq-item.open .faq-q svg{transform:rotate(45deg);color:var(--p500)}
+.faq-a{font-size:.85rem;line-height:1.75;color:var(--muted);max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:18px}
+
+/* ─── FINAL CTA ──────────────────────────────────────────────────────── */
+#cta-final{padding:100px 0;background:linear-gradient(135deg,var(--p900) 0%,#2D0B6B 45%,#4C1D95 100%);position:relative;overflow:hidden}
+#cta-final::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(167,139,250,.15) 1px,transparent 1px);background-size:28px 28px;opacity:.5}
+#cta-final::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(ellipse,rgba(124,58,237,.2) 0%,transparent 65%);pointer-events:none}
+.cta-inner{text-align:center;position:relative;z-index:1}
+.cta-inner h2{color:#fff;margin-bottom:14px}
+.cta-inner p{color:rgba(255,255,255,.6);margin-bottom:32px;font-size:1rem;line-height:1.7;max-width:500px;margin-left:auto;margin-right:auto}
+.cta-form{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.cta-input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;padding:12px 18px;border-radius:var(--r2);font-family:'Manrope',sans-serif;font-size:.9rem;width:280px;outline:none;transition:border-color .2s;cursor:none}
+.cta-input::placeholder{color:rgba(255,255,255,.35)}
+.cta-input:focus{border-color:rgba(255,255,255,.4)}
+.cta-note{font-size:.74rem;color:rgba(255,255,255,.35)}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────── */
+footer{background:var(--p900);color:rgba(255,255,255,.6);padding:60px 0 32px}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-brand .nav-logo-text{color:#fff;display:block;font-size:1.05rem;margin-bottom:14px}
+.footer-brand p{font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.45);margin-bottom:18px;max-width:280px}
+.footer-social{display:flex;gap:8px}
+.footer-social a{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;transition:all .18s;cursor:none}
+.footer-social a:hover{background:rgba(255,255,255,.14)}
+.footer-social svg{width:15px;height:15px;color:rgba(255,255,255,.6)}
+.footer-col-title{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.8);margin-bottom:16px}
+.footer-links{display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:.82rem;color:rgba(255,255,255,.45);transition:color .18s;cursor:none}
+.footer-links a:hover{color:rgba(255,255,255,.9)}
+.footer-bottom{padding-top:24px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:.75rem}
+.footer-legal{display:flex;gap:20px}
+.footer-legal a{font-size:.75rem;color:rgba(255,255,255,.35);cursor:none;transition:color .18s}
+.footer-legal a:hover{color:rgba(255,255,255,.7)}
+
+/* ─── MARQUEE ────────────────────────────────────────────────────────── */
+.marquee-wrap{overflow:hidden;background:var(--p900);padding:14px 0}
+.marquee-track{display:flex;gap:36px;width:max-content;animation:marquee 40s linear infinite}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.mq-item{white-space:nowrap;font-family:'Noto Serif',serif;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:24px}
+.mq-item::after{content:'✦';color:rgba(167,139,250,.5)}
+
+/* ─── SCROLL REVEAL ──────────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+.r1{transition-delay:.07s}.r2{transition-delay:.14s}.r3{transition-delay:.21s}.r4{transition-delay:.28s}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:980px){
+  .hero-inner,.fs-inner,.ai-inner,.cal-section-inner,.prop-inner,.feat-panel.active{grid-template-columns:1fr}
+  .testi-grid,.price-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .hero-float{display:none}
+  .fs-inner.flip{direction:ltr}
+}
+@media(max-width:640px){
+  .testi-grid,.price-grid,.hcb-stats,.dd-grid{grid-template-columns:1fr}
+  .hero-btns{flex-direction:column;align-items:flex-start}
+  .trusted-inner{flex-direction:column;gap:16px}
+  .trusted-label{padding:0;border:none}
+  h1{font-size:2.2rem}
+}
 </style>
 </head>
 <body>
-<div id="cur"><div class="cur-dot"></div><div class="cur-ring"></div></div>
 
-<nav id="sidebar">
-  <div class="logo-area">
-    <div class="logo-mark">
-      <svg viewBox="0 0 20 20" fill="none"><path d="M3 15L7 9L11 12L15 5L17 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="5" r="2" fill="white"/></svg>
-    </div>
-    <div><div class="logo-text">TradeGrid</div><div class="logo-sub">AI Journal</div></div>
-  </div>
-  <div class="nav-section">
-    <div class="nav-label">Journal</div>
-    <a class="nav-item active" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      Calendar
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      Analytics <span class="badge">NEW</span>
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6h16M4 10h16M4 14h10"/></svg>
-      Trade Log
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      Playbooks
-    </a>
-    <div class="nav-label" style="margin-top:14px">Challenges</div>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      FTMO Challenge <span class="badge live">LIVE</span>
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Risk Manager
-    </a>
-    <div class="nav-label" style="margin-top:14px">AI</div>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      AI Coach
-    </a>
-    <a class="nav-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      Pattern Scanner
-    </a>
-  </div>
-  <div class="sidebar-account">
-    <div class="avatar">DS</div>
-    <div><div class="acc-name">Daniel SMC</div><div class="acc-plan">Elite Plan</div></div>
-    <div style="margin-left:auto;color:var(--muted);opacity:.5">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+<!-- CURSOR -->
+<div id="cur"><div class="cur-d"></div><div class="cur-r"></div></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <!-- Logo -->
+      <a class="nav-logo" href="#">
+        <svg width="28" height="28" viewBox="0 0 58 58" fill="none">
+          <defs>
+            <linearGradient id="n-o" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4C1D95"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient>
+            <linearGradient id="n-i" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient>
+            <radialGradient id="n-c" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#4C1D95"/></radialGradient>
+          </defs>
+          <circle cx="29" cy="29" r="27" stroke="url(#n-o)" stroke-width=".9" fill="none" stroke-dasharray="2.5 3.5" stroke-opacity=".5"/>
+          <circle cx="29" cy="3" r="3.2" fill="url(#n-o)"/><circle cx="50" cy="15" r="3.2" fill="url(#n-o)"/>
+          <circle cx="50" cy="43" r="3.2" fill="url(#n-o)"/><circle cx="29" cy="55" r="3.2" fill="url(#n-o)"/>
+          <circle cx="8" cy="43" r="3.2" fill="url(#n-o)"/><circle cx="8" cy="15" r="3.2" fill="url(#n-o)"/>
+          <line x1="29" y1="3" x2="29" y2="16" stroke="#C4B5FD" stroke-width=".75"/><line x1="50" y1="15" x2="40" y2="22" stroke="#C4B5FD" stroke-width=".75"/>
+          <line x1="50" y1="43" x2="40" y2="36" stroke="#C4B5FD" stroke-width=".75"/><line x1="29" y1="55" x2="29" y2="42" stroke="#C4B5FD" stroke-width=".75"/>
+          <line x1="8" y1="43" x2="18" y2="36" stroke="#C4B5FD" stroke-width=".75"/><line x1="8" y1="15" x2="18" y2="22" stroke="#C4B5FD" stroke-width=".75"/>
+          <circle cx="29" cy="16" r="2.4" fill="url(#n-i)"/><circle cx="40" cy="22" r="2.4" fill="url(#n-i)"/>
+          <circle cx="40" cy="36" r="2.4" fill="url(#n-i)"/><circle cx="29" cy="42" r="2.4" fill="url(#n-i)"/>
+          <circle cx="18" cy="36" r="2.4" fill="url(#n-i)"/><circle cx="18" cy="22" r="2.4" fill="url(#n-i)"/>
+          <line x1="29" y1="16" x2="29" y2="23" stroke="#7C3AED" stroke-width="1.2"/><line x1="40" y1="22" x2="34" y2="26" stroke="#7C3AED" stroke-width="1.2"/>
+          <line x1="40" y1="36" x2="34" y2="32" stroke="#7C3AED" stroke-width="1.2"/><line x1="29" y1="42" x2="29" y2="35" stroke="#7C3AED" stroke-width="1.2"/>
+          <line x1="18" y1="36" x2="24" y2="32" stroke="#7C3AED" stroke-width="1.2"/><line x1="18" y1="22" x2="24" y2="26" stroke="#7C3AED" stroke-width="1.2"/>
+          <circle cx="29" cy="29" r="5.5" fill="url(#n-c)"/>
+        </svg>
+        <span class="nav-logo-text">TradeGrid</span>
+      </a>
+
+      <!-- Nav links -->
+      <ul class="nav-links">
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            Products
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </a>
+          <div class="nav-dropdown">
+            <div class="dd-grid">
+              <a class="dd-item" href="#features">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+                <div><div class="dd-title">Journaling + Analytics</div><div class="dd-desc">Sync and log every trade. Analyse performance with 50+ metrics.</div></div>
+              </a>
+              <a class="dd-item" href="#ai-section">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                <div><div class="dd-title">Zella AI <span class="dd-badge">New</span></div><div class="dd-desc">Ask questions, detect patterns, and get personalised trading insights.</div></div>
+              </a>
+              <a class="dd-item" href="#propfirm">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div><div class="dd-title">Prop Firm Sync</div><div class="dd-desc">One dashboard for all your prop firm accounts. Track rules & progress.</div></div>
+              </a>
+              <a class="dd-item" href="#calendar-section">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                <div><div class="dd-title">Performance Calendar</div><div class="dd-desc">See your entire month's R:R at a glance. Daily, weekly, by session.</div></div>
+              </a>
+              <a class="dd-item" href="#">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                <div><div class="dd-title">Trade Replay</div><div class="dd-desc">Replay any trade tick-by-tick with AI commentary.</div></div>
+              </a>
+              <a class="dd-item" href="#">
+                <div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg></div>
+                <div><div class="dd-title">Voice Journaling</div><div class="dd-desc">Speak your notes. AI transcribes, tags emotion, and links to your trade.</div></div>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#pricing">Pricing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#brokers">Brokers</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            Resources
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </a>
+          <div class="nav-dropdown" style="min-width:340px">
+            <div class="dd-grid" style="grid-template-columns:1fr">
+              <a class="dd-item" href="#"><div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div><div class="dd-title">Blog</div><div class="dd-desc">Helping you become a better trader — education and insights.</div></div></a>
+              <a class="dd-item" href="#faq"><div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div><div><div class="dd-title">FAQ & Help</div><div class="dd-desc">Answers to the most common questions about TradeGrid.</div></div></a>
+              <a class="dd-item" href="#"><div class="dd-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><div><div class="dd-title">Free Trading Tools</div><div class="dd-desc">R:R calculator, position sizer, and risk manager — free forever.</div></div></a>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="nav-right">
+        <a class="btn btn-ghost btn-sm" href="tradegrid_auth.html">Log In</a>
+        <a class="btn btn-primary btn-sm" href="tradegrid_auth.html">Get Started →</a>
+      </div>
     </div>
   </div>
 </nav>
 
-<div id="main">
-  <div id="topbar">
-    <div class="page-title">Dashboard <span>March 2026</span></div>
-    <div class="top-stat"><div><div class="top-stat-label">NET P&L</div><div class="top-stat-val pos-c" id="c-pnl">+15RR</div></div></div>
-    <div class="top-stat"><div><div class="top-stat-label">WIN RATE</div><div class="top-stat-val sky-c">62%</div></div></div>
-    <div class="top-stat"><div><div class="top-stat-label">DAILY DD</div><div class="top-stat-val amb-c">1.2%</div></div></div>
-    <div style="background:var(--glass);border:1px solid var(--border);padding:6px 13px;border-radius:8px;display:flex;align-items:center;gap:9px">
-      <div style="font-size:.6rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">FTMO</div>
-      <div style="width:80px;height:4px;background:var(--glass2);border-radius:2px;overflow:hidden">
-        <div id="ftmo-tb" style="width:0%;height:100%;background:linear-gradient(90deg,var(--blue2),var(--cyan));border-radius:2px;transition:width 1.4s cubic-bezier(.16,1,.3,1)"></div>
-      </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--sky)">7.5%</div>
-    </div>
-    <button class="add-btn" onclick="openM()">
-      <span>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:-1px;margin-right:4px"><path d="M12 5v14M5 12h14"/></svg>
-        Log Trade
-      </span>
-    </button>
-  </div>
-
-  <div id="layout">
-    <div id="left">
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-lbl">Total Trades</div>
-          <div class="stat-num" id="c1">0</div>
-          <div class="stat-sub" style="color:var(--green)">↑ +3 this week</div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <!-- Left text -->
+      <div>
+        <div class="hero-badge reveal"><span class="hero-dot"></span>Next-Gen Trading Terminal</div>
+        <h1 class="hero-h1 reveal r1">The AI Coach that<br><em>remembers</em> every trade.</h1>
+        <p class="lead hero-sub reveal r2">TradeGrid bridges the gap between institutional analysis and retail execution. Record, review, and refine your edge with a voice-first journal powered by bespoke AI.</p>
+        <div class="hero-btns reveal r3">
+          <a class="btn btn-primary btn-lg" href="tradegrid_auth.html">Get Started Free →</a>
+          <a class="btn btn-outline btn-lg" href="#features">See how it works</a>
         </div>
-        <div class="stat-card">
-          <div class="stat-lbl">Avg R:R</div>
-          <div class="stat-num pos-c" id="c2">0</div>
-          <div class="stat-sub">Best: XAUUSD</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-lbl">Profit Factor</div>
-          <div class="stat-num pos-c" id="c3">0</div>
-          <div class="stat-sub" style="color:var(--green)">↑ vs 1.8 prev</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-lbl">Max Drawdown</div>
-          <div class="stat-num amb-c" id="c4">0%</div>
-          <div class="stat-sub" style="color:var(--amber)">⚠ Limit: 10%</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-lbl">Avg Setup Grade</div>
-          <div class="stat-num sky-c" id="c5">—</div>
-          <div class="stat-sub" style="color:var(--green)">82% A+ setups</div>
-        </div>
-      </div>
-
-      <div class="sec-hdr">
-        <div class="sec-title">Performance Calendar — March 2026</div>
-        <div class="ctrl-grp">
-          <button class="cbtn on">RR</button>
-          <button class="cbtn">P&L</button>
-          <button class="cbtn">Win%</button>
-          <button class="cbtn">◀</button>
-          <button class="cbtn">▶</button>
-        </div>
-      </div>
-      <div class="cal-wrap">
-        <div class="cal-head">
-          <div class="cal-dl">Sun</div><div class="cal-dl">Mon</div><div class="cal-dl">Tue</div>
-          <div class="cal-dl">Wed</div><div class="cal-dl">Thu</div><div class="cal-dl">Fri</div>
-          <div class="cal-dl" style="opacity:.4">Sat</div>
-          <div class="cal-dl" style="font-size:.52rem">WEEKLY</div>
-        </div>
-        <div id="cal-grid"></div>
-      </div>
-
-      <div class="sec-hdr">
-        <div class="sec-title">Recent Trades</div>
-        <div class="ctrl-grp">
-          <button class="cbtn on">All</button>
-          <button class="cbtn">XAUUSD</button>
-          <button class="cbtn">FX</button>
-          <button class="cbtn">Indices</button>
-        </div>
-      </div>
-      <div class="trd-sec">
-        <table class="trd-tbl">
-          <thead><tr>
-            <th>Pair</th><th>Dir</th><th>Date</th><th>Session</th>
-            <th>R:R</th><th>Grade</th><th>Emotion</th><th>AI Note</th>
-          </tr></thead>
-          <tbody id="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div id="right">
-      <div class="ai-hdr">
-        <div class="ai-av">
-          <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="white" stroke-width="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="5" r="1.5" fill="#f59e0b"/></svg>
-        </div>
-        <div><div class="ai-nm">Grid AI Coach</div><div class="ai-st">● Online — watching your trades</div></div>
-        <button class="ai-mode">Deep Analysis</button>
-      </div>
-
-      <div class="msgs" id="msgs">
-        <div class="msg ai">
-          <div class="mb">Good morning, Daniel. Before you trade today, here's your March 25 briefing based on your last 47 trades 👇</div>
-          <div class="mt">07:02 AM</div>
-        </div>
-        <div class="msg ai">
-          <div class="ins-card">
-            <div class="ins-ttl">Your edge today</div>
-            <div class="ins-i">XAUUSD London open: 78% win rate — your best setup</div>
-            <div class="ins-i">Avoid NY session GBPJPY — only 33% win rate</div>
-            <div class="ins-i">You're 7.5% toward your FTMO 10% target</div>
-            <div class="ins-i">Sweet spot hold time: 45–90 mins for max RR</div>
+        <div class="hero-social-proof reveal r4">
+          <div class="proof-avatars">
+            <div class="proof-av">AK</div>
+            <div class="proof-av">SM</div>
+            <div class="proof-av">JR</div>
+            <div class="proof-av">TP</div>
+            <div class="proof-av">VD</div>
           </div>
-          <div class="mt">07:02 AM</div>
-        </div>
-        <div class="msg usr">
-          <div class="mb">Why did I lose on Wednesday last week?</div>
-          <div class="mt">09:14 AM</div>
-        </div>
-        <div class="msg ai" id="typer">
-          <div class="typing"><span></span><span></span><span></span></div>
-        </div>
-      </div>
-
-      <div class="pills">
-        <button class="pill" onclick="sendQ(this)">My worst pairs</button>
-        <button class="pill" onclick="sendQ(this)">Grade my week</button>
-        <button class="pill" onclick="sendQ(this)">Am I revenge trading?</button>
-        <button class="pill" onclick="sendQ(this)">Best session for me</button>
-      </div>
-      <div class="ai-inp-row">
-        <input class="ai-inp" id="ai-in" placeholder="Ask your coach anything..." onkeydown="if(event.key==='Enter')sendMsg()">
-        <button class="ai-send" onclick="sendMsg()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-        </button>
-      </div>
-
-      <div class="mini-sec">
-        <div class="mini-hdr">
-          <div class="sec-title" style="font-size:.75rem">Equity Curve — March</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green)">+15.0R</div>
-        </div>
-        <canvas id="eq" height="65" style="width:100%"></canvas>
-      </div>
-
-      <div class="mini-sec" style="padding-top:12px">
-        <div class="mini-hdr">
-          <div class="sec-title" style="font-size:.75rem">Pair Performance</div>
-          <div style="font-size:.6rem;color:var(--muted)">this month</div>
-        </div>
-        <div class="pair-list" id="pairs"></div>
-      </div>
-
-      <div class="ftmo-card">
-        <div class="ftmo-ttl">
-          <div class="ftmo-nm">FTMO $100K Challenge</div>
-          <div class="ftmo-phase">PHASE 1</div>
-        </div>
-        <div class="prog-row">
-          <div class="prog-labels">
-            <span style="color:var(--muted)">Profit Target (10%)</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--green)">7.5% / 10%</span>
+          <div>
+            <div class="hero-stars">★★★★★</div>
+            <div class="proof-text"><strong>2,500+</strong> prop firm traders trust TradeGrid</div>
           </div>
-          <div class="prog-bar"><div class="prog-fill" id="pb1" style="width:0%;background:linear-gradient(90deg,var(--green),rgba(16,217,138,.35))"></div></div>
         </div>
-        <div class="prog-row">
-          <div class="prog-labels">
-            <span style="color:var(--muted)">Max DD Used (10% limit)</span>
-            <span style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--amber)">2.1% used</span>
+      </div>
+
+      <!-- Right visual -->
+      <div class="hero-visual reveal r2">
+        <div class="hero-card">
+          <div class="hero-card-bar">
+            <div class="hcb-dot" style="background:#F87171"></div>
+            <div class="hcb-dot" style="background:#FBBF24"></div>
+            <div class="hcb-dot" style="background:#34D399"></div>
+            <div class="hcb-url">app.tradegrid.io/dashboard</div>
+            <span style="margin-left:auto;font-size:.6rem;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:2px 8px;font-weight:700;letter-spacing:.06em">LIVE</span>
           </div>
-          <div class="prog-bar"><div class="prog-fill" style="width:21%;background:linear-gradient(90deg,var(--amber),rgba(245,158,11,.3))"></div></div>
+          <div class="hero-card-body">
+            <div class="hcb-stats">
+              <div class="hcb-stat">
+                <div class="hcb-stat-lbl">Average ROI</div>
+                <div class="hcb-stat-val" style="color:var(--p500)">14.2%</div>
+              </div>
+              <div class="hcb-stat">
+                <div class="hcb-stat-lbl">Trades Analysed</div>
+                <div class="hcb-stat-val">1,240+</div>
+              </div>
+              <div class="hcb-stat">
+                <div class="hcb-stat-lbl">Success Rate</div>
+                <div class="hcb-stat-val" style="color:var(--green)">68%</div>
+              </div>
+            </div>
+            <div class="hcb-chart-wrap">
+              <div class="hcb-chart-label">Equity Curve (YTD)</div>
+              <svg width="100%" height="72" viewBox="0 0 320 72" fill="none">
+                <defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".18"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0 64 C25 58, 50 52, 80 44 C110 36, 130 40, 160 32 C190 24, 210 28, 240 18 C265 10, 285 6, 320 4" stroke="#7C3AED" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M0 64 C25 58, 50 52, 80 44 C110 36, 130 40, 160 32 C190 24, 210 28, 240 18 C265 10, 285 6, 320 4 L320 72 L0 72 Z" fill="url(#hg)"/>
+                <circle cx="320" cy="4" r="3.5" fill="#7C3AED"/>
+              </svg>
+            </div>
+            <div class="hcb-ai-box">
+              <div class="hcb-ai-header">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--p500)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+                <span class="hcb-ai-tag">AI Insight</span>
+              </div>
+              <p class="hcb-ai-text">"You entered this trade based on a 4H breakout but showed signs of hesitation. Data suggests your win rate increases when holding past the first RR target."</p>
+            </div>
+          </div>
+        </div>
+        <!-- Floating cards -->
+        <div class="hero-float hero-float-1">
+          <div class="hf-label">Win Rate This Month</div>
+          <div class="hf-val" style="color:var(--green)">64.2%</div>
+          <div class="hf-sub pos"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 6l-9.5 9.5-5-5L1 18"/></svg>+3.4% vs last month</div>
+        </div>
+        <div class="hero-float hero-float-2">
+          <div class="hf-label">FTMO Target Progress</div>
+          <div style="height:5px;background:var(--border);border-radius:3px;margin:8px 0;overflow:hidden"><div style="width:75%;height:100%;background:linear-gradient(90deg,var(--p500),var(--p300));border-radius:3px"></div></div>
+          <div class="hf-sub neutral">7.5% / 10% target</div>
         </div>
       </div>
     </div>
   </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TRUSTED BY
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="trusted">
+  <div class="container">
+    <div class="trusted-inner">
+      <span class="trusted-label">Trusted by</span>
+      <div class="trusted-logos">
+        <div class="trusted-logo"><div class="trusted-logo-av">VD</div><span class="trusted-logo-name">Vincent Desiano</span></div>
+        <div class="trusted-logo"><div class="trusted-logo-av">TT</div><span class="trusted-logo-name">Tori Trades</span></div>
+        <div class="trusted-logo"><div class="trusted-logo-av">UA</div><span class="trusted-logo-name">Umar Ashraf</span></div>
+        <div class="trusted-logo"><div class="trusted-logo-av">JC</div><span class="trusted-logo-name">JadeCap</span></div>
+        <div class="trusted-logo"><div class="trusted-logo-av">CR</div><span class="trusted-logo-name">Carmine Rosato</span></div>
+        <div class="trusted-logo"><div class="trusted-logo-av" style="background:linear-gradient(135deg,#DC2626,#991B1B)">SF</div><span class="trusted-logo-name">Scarface Trades</span></div>
+      </div>
+      <div class="trustpilot">
+        <div>
+          <div class="tp-stars">★★★★★</div>
+          <div class="tp-text">Excellent</div>
+          <div class="tp-sub">Trustpilot</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MARQUEE
+═══════════════════════════════════════════════════════════════════════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mq"></div>
 </div>
 
-<div class="modal-ov" id="mov" onclick="if(event.target===this)closeM()">
-  <div class="modal">
-    <div class="m-hdr"><div class="m-ttl">Log New Trade</div><button class="m-close" onclick="closeM()">✕</button></div>
-    <div class="m-body">
-      <div class="fr">
-        <div class="fg"><label class="fl">Pair</label><input class="fi" placeholder="XAUUSD" list="pl"></div>
-        <div class="fg"><label class="fl">Direction</label><select class="fi"><option>BUY</option><option>SELL</option></select></div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     FEATURE TABS
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="features">
+  <div class="container">
+    <div class="feat-tabs-header reveal">
+      <div class="eyebrow">What we built</div>
+      <h2>Everything missing from every other journal.</h2>
+    </div>
+
+    <!-- Tab nav -->
+    <div class="feat-tabs-nav" id="ftabs">
+      <button class="feat-tab active" data-tab="0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Analytics
+      </button>
+      <button class="feat-tab" data-tab="1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Notebook
+      </button>
+      <button class="feat-tab" data-tab="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Calendar
+      </button>
+      <button class="feat-tab" data-tab="3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 10h16M4 14h10"/></svg>
+        Journal
+      </button>
+      <button class="feat-tab" data-tab="4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Replay
+      </button>
+      <button class="feat-tab" data-tab="5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Playbook
+      </button>
+    </div>
+
+    <!-- Panel 0: Analytics -->
+    <div class="feat-panel active" id="fp-0">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Performance Analytics</div>
+        <h2>Institutional-grade metrics. Finally, for retail.</h2>
+        <p class="lead">Stop guessing what's working. TradeGrid gives you 50+ metrics — expectancy, MFE, profit factor, Sharpe ratio — and translates them into plain English coaching advice.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Win rate, profit factor & expectancy by pair and session</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Max drawdown tracker with FTMO rule monitoring</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Live equity curve updated with every broker sync</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Session breakdown: London vs NY vs Asian performance</div>
+        </div>
+        <a class="btn btn-primary" href="tradegrid_auth.html">Try Analytics Free →</a>
       </div>
-      <datalist id="pl"><option>XAUUSD</option><option>GBPJPY</option><option>NASDAQ</option><option>EURUSD</option><option>US100</option></datalist>
-      <div class="fr">
-        <div class="fg"><label class="fl">Entry Price</label><input class="fi" placeholder="2315.50" type="number"></div>
-        <div class="fg"><label class="fl">Exit Price</label><input class="fi" placeholder="2328.00" type="number"></div>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar">
+          <div class="fv-dot" style="background:#F87171"></div>
+          <div class="fv-dot" style="background:#FBBF24"></div>
+          <div class="fv-dot" style="background:#34D399"></div>
+          <span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:8px">Analytics Dashboard</span>
+        </div>
+        <div class="fv-body">
+          <!-- Stat mini row -->
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">
+            <div style="background:var(--bg);border-radius:var(--r3);padding:10px"><div style="font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">NET PROFIT</div><div style="font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700">$42,850</div><div style="font-size:.68rem;color:var(--green);font-weight:600;margin-top:2px">↑ +12.4%</div></div>
+            <div style="background:var(--bg);border-radius:var(--r3);padding:10px"><div style="font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">WIN RATE</div><div style="font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700">64.2%</div><div style="font-size:.68rem;color:var(--p500);font-weight:600;margin-top:2px">Top Quartile</div></div>
+          </div>
+          <!-- Mini equity -->
+          <div style="background:var(--bg);border-radius:var(--r3);padding:12px;margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Equity Curve</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--green);font-weight:700">+12.4%</span>
+            </div>
+            <svg width="100%" height="60" viewBox="0 0 280 60" fill="none">
+              <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7C3AED" stop-opacity=".15"/><stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0 52 C30 46, 60 40, 90 33 C120 26, 140 32, 170 22 C200 12, 230 18, 280 6" stroke="#7C3AED" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M0 52 C30 46, 60 40, 90 33 C120 26, 140 32, 170 22 C200 12, 230 18, 280 6 L280 60 L0 60Z" fill="url(#fg)"/>
+            </svg>
+          </div>
+          <!-- Pair bars -->
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;width:52px;color:var(--on-surface)">XAUUSD</span><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:78%;height:100%;background:linear-gradient(90deg,var(--p500),var(--p300));border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--p500);font-weight:600;width:28px;text-align:right">78%</span></div>
+            <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;width:52px;color:var(--on-surface)">EURUSD</span><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:64%;height:100%;background:linear-gradient(90deg,var(--p500),var(--p300));border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--p500);font-weight:600;width:28px;text-align:right">64%</span></div>
+            <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:600;width:52px;color:var(--on-surface)">GBPJPY</span><div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:41%;height:100%;background:linear-gradient(90deg,var(--p500),var(--p300));border-radius:3px"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--p500);font-weight:600;width:28px;text-align:right">41%</span></div>
+          </div>
+        </div>
       </div>
-      <div class="fr">
-        <div class="fg"><label class="fl">Risk (R)</label><input class="fi" placeholder="1" type="number"></div>
-        <div class="fg"><label class="fl">Session</label><select class="fi"><option>London</option><option>New York</option><option>Asian</option><option>London/NY Overlap</option></select></div>
+    </div>
+
+    <!-- Panel 1: Notebook -->
+    <div class="feat-panel" id="fp-1">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Voice-First Notebook</div>
+        <h2>Journal like speaking to a coach. Not a spreadsheet.</h2>
+        <p class="lead">Speak your trade notes after every session. Whisper AI transcribes the audio, the AI coach tags the emotion, and everything is automatically linked to the correct trade. Zero friction journaling.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Voice notes transcribed and tagged by AI in real-time</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Emotional state tracking: FOMO, revenge, calm, confident</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Screenshot upload with TradingView chart embed</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Daily AI recap — shareable session narrative</div>
+        </div>
+        <a class="btn btn-primary" href="tradegrid_auth.html">Start Voice Journaling →</a>
       </div>
-      <div class="fr"><div class="fg full"><label class="fl">Setup Tag</label><input class="fi" placeholder="SMC BOS + FVG + OB confluence"></div></div>
-      <div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Emotional State</div>
-      <div class="emo-row">
-        <button class="ebo on">😌<br>Calm</button>
-        <button class="ebo">😤<br>FOMO</button>
-        <button class="ebo">😰<br>Fearful</button>
-        <button class="ebo">😤<br>Revenge</button>
-        <button class="ebo">😎<br>Confident</button>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar"><div class="fv-dot" style="background:#F87171"></div><div class="fv-dot" style="background:#FBBF24"></div><div class="fv-dot" style="background:#34D399"></div><span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:8px">Voice Journal Entry</span></div>
+        <div class="fv-body">
+          <div style="background:var(--p50);border:1px solid rgba(124,58,237,.15);border-radius:var(--r3);padding:14px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--p500);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg></div>
+              <div><div style="font-size:.72rem;font-weight:700;color:var(--p500)">Recording Entry Log</div><div style="font-size:.62rem;color:var(--muted)">Transcribing…</div></div>
+              <div style="margin-left:auto;display:flex;gap:3px;align-items:center"><div style="width:3px;height:12px;background:var(--p300);border-radius:2px;animation:wavebar 1s ease-in-out infinite"></div><div style="width:3px;height:18px;background:var(--p400);border-radius:2px;animation:wavebar 1s ease-in-out .1s infinite"></div><div style="width:3px;height:10px;background:var(--p500);border-radius:2px;animation:wavebar 1s ease-in-out .2s infinite"></div><div style="width:3px;height:16px;background:var(--p400);border-radius:2px;animation:wavebar 1s ease-in-out .3s infinite"></div></div>
+            </div>
+            <p style="font-size:.78rem;color:var(--on-surface-2);line-height:1.7;font-style:italic">"Taking a bit short here at 2312. Volume is drying up all resistance. Feeling a bit pressured because I took a loss earlier, but the setup is clean."</p>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--bg);border-radius:var(--r3);padding:10px"><div style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">EMOTION TAG</div><div style="display:flex;align-items:center;gap:5px;font-size:.78rem;font-weight:600;color:var(--amber)">⚠ Slight Pressure</div></div>
+            <div style="background:var(--bg);border-radius:var(--r3);padding:10px"><div style="font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">SETUP GRADE</div><div style="font-size:.78rem;font-weight:700;color:var(--green)">A+ Setup</div></div>
+          </div>
+        </div>
       </div>
-      <div class="fr"><div class="fg full"><label class="fl">Trade Notes</label><input class="fi" placeholder="Entry reasoning, what I saw, what I could improve..."></div></div>
-      <button class="m-sub" onclick="subTrade()">⚡ Log Trade & Get AI Grade</button>
+    </div>
+
+    <!-- Panel 2: Calendar -->
+    <div class="feat-panel" id="fp-2">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Performance Calendar</div>
+        <h2>See your entire month in one glance.</h2>
+        <p class="lead">The performance calendar is the heart of TradeGrid. Daily R:R cells, weekly totals, colour-coded green and red — exactly like your manual spreadsheet but live, instant, and AI-enhanced.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Click any day to see every trade, note, and screenshot</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Filter by session: London, New York, Asian</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Toggle between R:R, P&L, and Win% views</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>AI highlights your best and worst patterns by day</div>
+        </div>
+        <a class="btn btn-primary" href="tradegrid_auth.html">View Calendar Demo →</a>
+      </div>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar"><div class="fv-dot" style="background:#F87171"></div><div class="fv-dot" style="background:#FBBF24"></div><div class="fv-dot" style="background:#34D399"></div><span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:8px">October 2024 — Calendar</span></div>
+        <div class="fv-body" id="mini-cal"></div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Journal -->
+    <div class="feat-panel" id="fp-3">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Trade Journal</div>
+        <h2>Every trade. Logged, graded, and coached.</h2>
+        <p class="lead">Log trades manually or let your broker sync do it automatically. Every entry gets an AI setup grade, an emotional tag, and a coaching note — turning your history into a personalized playbook.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Setup grader: A+ / A / B / C / F based on your own rules</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Chart vision AI: upload screenshot for instant analysis</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>MT4, MT5, cTrader auto-sync — zero manual entry</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Revenge trade alert with 30-minute session lock</div>
+        </div>
+        <a class="btn btn-primary" href="tradegrid_auth.html">Start Journaling Free →</a>
+      </div>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar"><div class="fv-dot" style="background:#F87171"></div><div class="fv-dot" style="background:#FBBF24"></div><div class="fv-dot" style="background:#34D399"></div><span style="font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-left:8px">Trade Detail — XAUUSD Long</span></div>
+        <div class="fv-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div><div style="font-family:'Noto Serif',serif;font-size:.95rem;font-weight:700">XAUUSD Long @ 2,315</div><div style="font-size:.72rem;color:var(--muted);margin-top:2px">Jul 24, 2024 · London Session</div></div>
+            <div style="text-align:right"><div style="font-size:.6rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">P&L</div><div style="font-family:'Noto Serif',serif;font-size:1.2rem;font-weight:700;color:var(--green)">+$1,450</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px">
+            <div style="background:var(--bg);border-radius:var(--r2);padding:8px;text-align:center"><div style="font-size:.58rem;color:var(--muted);font-weight:600;margin-bottom:3px">GRADE</div><div style="font-size:.85rem;font-weight:800;color:var(--green)">A+</div></div>
+            <div style="background:var(--bg);border-radius:var(--r2);padding:8px;text-align:center"><div style="font-size:.58rem;color:var(--muted);font-weight:600;margin-bottom:3px">R:R</div><div style="font-size:.85rem;font-weight:700;font-family:'JetBrains Mono',monospace">1:2.4</div></div>
+            <div style="background:var(--bg);border-radius:var(--r2);padding:8px;text-align:center"><div style="font-size:.58rem;color:var(--muted);font-weight:600;margin-bottom:3px">EMOTION</div><div style="font-size:.78rem;font-weight:600;color:var(--green)">😌 Calm</div></div>
+          </div>
+          <div style="background:var(--p50);border:1px solid rgba(124,58,237,.15);border-radius:var(--r2);padding:10px">
+            <div style="font-size:.6rem;font-weight:700;color:var(--p500);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">AI Coach Note</div>
+            <p style="font-size:.76rem;color:var(--on-surface-2);line-height:1.65;font-style:italic">"Execution was precise. Entry aligned with your 4H demand zone playbook. Consider tighter trailing stop on the final 25%."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Replay -->
+    <div class="feat-panel" id="fp-4">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Trade Replay</div>
+        <h2>Watch your trades unfold. Bar by bar.</h2>
+        <p class="lead">Step through any trade tick-by-tick with AI commentary at each key moment. See exactly where you deviated from your plan — and what it cost you in R.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Step forward or backward through any closed trade</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>AI highlights deviation moments from your rules</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Multi-timeframe replay: 1M, 5M, 15M, 1H, 4H</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Available on Pro and Elite plans</div>
+        </div>
+        <a class="btn btn-primary" href="#pricing">Upgrade for Replay →</a>
+      </div>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar"><div class="fv-dot" style="background:#F87171"></div><div class="fv-dot" style="background:#FBBF24"></div><div class="fv-dot" style="background:#34D399"></div><span style="font-size:.68rem;color:var(--muted);margin-left:8px">Trade Replay — NVDA Long</span></div>
+        <div class="fv-body">
+          <div style="background:var(--bg);border-radius:var(--r3);padding:10px;min-height:160px;position:relative;overflow:hidden">
+            <svg width="100%" height="140" viewBox="0 0 320 140" fill="none">
+              <line x1="0" y1="35" x2="320" y2="35" stroke="#EDE9FE" stroke-width=".6" stroke-dasharray="3 4"/>
+              <line x1="0" y1="70" x2="320" y2="70" stroke="#EDE9FE" stroke-width=".6" stroke-dasharray="3 4"/>
+              <line x1="0" y1="105" x2="320" y2="105" stroke="#EDE9FE" stroke-width=".6" stroke-dasharray="3 4"/>
+              <rect x="20" y="90" width="10" height="30" rx="1" fill="#059669" fill-opacity=".8"/>
+              <rect x="36" y="82" width="10" height="25" rx="1" fill="#DC2626" fill-opacity=".8"/>
+              <rect x="52" y="75" width="10" height="32" rx="1" fill="#059669" fill-opacity=".8"/>
+              <rect x="68" y="88" width="10" height="20" rx="1" fill="#DC2626" fill-opacity=".8"/>
+              <rect x="84" y="40" width="12" height="55" rx="1.5" fill="#059669"/>
+              <rect x="100" y="35" width="10" height="30" rx="1" fill="#059669" fill-opacity=".8"/>
+              <rect x="116" y="42" width="10" height="28" rx="1" fill="#DC2626" fill-opacity=".8"/>
+              <rect x="132" y="30" width="10" height="32" rx="1" fill="#059669" fill-opacity=".8"/>
+              <line x1="0" y1="95" x2="320" y2="95" stroke="#7C3AED" stroke-width="1" stroke-dasharray="3 4"/>
+              <text x="240" y="90" font-size="8" fill="#7C3AED" font-family="JetBrains Mono" font-weight="600">ENTRY 118.50</text>
+              <circle cx="90" cy="95" r="4" fill="#7C3AED"/>
+              <circle cx="90" cy="95" r="8" fill="#7C3AED" fill-opacity=".2"/>
+            </svg>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;padding:10px;background:var(--bg);border-radius:var(--r3)">
+            <button style="border:1px solid var(--border);background:#fff;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20L9 12l10-8v16z"/><line x1="5" y1="19" x2="5" y2="5"/></svg></button>
+            <button style="border:1px solid var(--border);background:#fff;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <button style="background:var(--p500);border:none;border-radius:6px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <button style="border:1px solid var(--border);background:#fff;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted)">Bar 34 / 240</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 5: Playbook -->
+    <div class="feat-panel" id="fp-5">
+      <div class="feat-panel-text reveal">
+        <div class="eyebrow">Playbooks</div>
+        <h2>Build your edge into a system. Share it.</h2>
+        <p class="lead">Create reusable strategy templates — your setup rules, entry conditions, risk parameters. Grade every trade against them. Share with your community or mentor.</p>
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Define your own A+ setup rules and conditions</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>AI auto-grades each trade against your playbook</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Share templates with students via mentor dashboard</div>
+          <div class="feat-item"><div class="feat-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>Community playbook marketplace — coming Q2 2026</div>
+        </div>
+        <a class="btn btn-primary" href="tradegrid_auth.html">Build Your Playbook →</a>
+      </div>
+      <div class="feat-visual reveal r2">
+        <div class="fv-bar"><div class="fv-dot" style="background:#F87171"></div><div class="fv-dot" style="background:#FBBF24"></div><div class="fv-dot" style="background:#34D399"></div><span style="font-size:.68rem;color:var(--muted);margin-left:8px">SMC Playbook v3</span></div>
+        <div class="fv-body">
+          <div style="font-family:'Noto Serif',serif;font-size:.95rem;font-weight:600;margin-bottom:6px">SMC BOS + FVG + OB</div>
+          <div style="font-size:.75rem;color:var(--muted);margin-bottom:14px">76 trades matched · 78% win rate</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:var(--r2)"><span style="font-size:.78rem;font-weight:600">Break of Structure</span><span style="font-size:.7rem;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:2px 8px;font-weight:700">Required</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:var(--r2)"><span style="font-size:.78rem;font-weight:600">Fair Value Gap present</span><span style="font-size:.7rem;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:2px 8px;font-weight:700">Required</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:var(--r2)"><span style="font-size:.78rem;font-weight:600">Order Block confluence</span><span style="font-size:.7rem;background:var(--amber-lo);color:var(--amber);border-radius:100px;padding:2px 8px;font-weight:700">Preferred</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:var(--r2)"><span style="font-size:.78rem;font-weight:600">London or NY open only</span><span style="font-size:.7rem;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:2px 8px;font-weight:700">Required</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border-radius:var(--r2)"><span style="font-size:.78rem;font-weight:600">Min R:R 1:2</span><span style="font-size:.7rem;background:var(--green-lo);color:var(--green-t);border-radius:100px;padding:2px 8px;font-weight:700">Required</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     AI SECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="ai-section">
+  <div class="container">
+    <div class="ai-inner">
+      <div class="ai-text reveal">
+        <div class="eyebrow">Grid AI Coach</div>
+        <h2>Your coach remembers<br>every trade you've taken.</h2>
+        <p class="lead">Most "AI" features in trading tools are just fancy filters. TradeGrid's AI coach stores your entire trade history in vector memory — so when you ask why you keep losing on Wednesdays, it actually knows.</p>
+        <div class="ai-features">
+          <div class="ai-feat">
+            <div class="ai-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 7l-8.5 8.5-5-5L1 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            <div><h4>Pattern Detection</h4><p>Finds your hidden patterns: "You lose 80% on Tuesday XAUUSD" — before you open the trade.</p></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div><h4>Revenge Trade Alert</h4><p>Detects rapid re-entry after losses. Triggers a real-time popup and 30-minute trading lock.</p></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><h4>Daily AI Recap</h4><p>Every session ends with a coach-written narrative recap with 3 insights — shareable to social.</p></div>
+          </div>
+          <div class="ai-feat">
+            <div class="ai-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><h4>Morning Briefing</h4><p>Push notification: your edge for today, distance to FTMO goal, which session to focus on.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal r2">
+        <div class="ai-demo">
+          <div class="ai-demo-header">
+            <div class="ai-av"><svg viewBox="0 0 20 20" fill="none" width="13" height="13"><circle cx="10" cy="7" r="3" stroke="white" stroke-width="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div><div class="ai-nm">Grid AI Coach</div><div class="ai-st">● Online — watching your trades</div></div>
+          </div>
+          <div class="ai-msgs">
+            <div class="ai-msg bot">Good morning Daniel. Before you trade today — here's your briefing based on your last 47 trades 👇</div>
+            <div class="ai-msg bot">
+              <div class="ai-insight-card">
+                <div class="ai-insight-title">Your edge this morning</div>
+                <div class="ai-insight-item">XAUUSD London open: 78% win rate — your best setup</div>
+                <div class="ai-insight-item">Avoid NY session GBPJPY — only 33% win rate historically</div>
+                <div class="ai-insight-item">You're 7.5% toward your FTMO 10% profit target</div>
+                <div class="ai-insight-item">Sweet spot hold time: 45–90 mins for max RR</div>
+              </div>
+            </div>
+            <div class="ai-msg user">Why did I keep losing on Wednesdays last week?</div>
+            <div class="ai-msg bot">Wednesday NY session is costing you 3.1R per month on average. Your entries are technically B-grade valid, but XAUUSD had irregular spreads after FOMC minutes. Fix: avoid XAUUSD 30 mins around USD high-impact news.</div>
+          </div>
+          <div class="ai-inp">
+            <input placeholder="Ask your coach anything…">
+            <div class="ai-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
+<!-- ═══════════════════════════════════════════════════════════════════
+     CALENDAR SECTION (standalone)
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="calendar-section">
+  <div class="container">
+    <div class="cal-section-inner">
+      <div class="reveal">
+        <div class="cal-card">
+          <div class="cal-header">
+            <div class="cal-title-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--p500)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+              <span>Monthly RR Performance</span>
+            </div>
+            <span class="cal-month">OCTOBER 2024</span>
+            <div class="cal-tabs">
+              <button class="cal-tab on">RR</button>
+              <button class="cal-tab">P&L</button>
+              <button class="cal-tab">Win%</button>
+            </div>
+          </div>
+          <div class="cal-body">
+            <div class="cal-days-header">
+              <div class="cal-dl">Mon</div><div class="cal-dl">Tue</div><div class="cal-dl">Wed</div>
+              <div class="cal-dl">Thu</div><div class="cal-dl">Fri</div><div class="cal-dl" style="opacity:.4">Sat</div><div class="cal-dl" style="opacity:.4">Sun</div>
+            </div>
+            <div class="cal-grid" id="main-cal"></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal r2">
+        <div class="eyebrow">Performance Calendar</div>
+        <h2>Your month at a glance. No spreadsheet needed.</h2>
+        <p class="lead">Every day shows your R:R, every week shows your total. Colour-coded cells reveal patterns instantly — which sessions are killing you, which days you're on fire.</p>
+        <div class="fs-points" style="margin-top:20px">
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <div><h4>Click any day for a full breakdown</h4><p>Every trade, screenshot, voice note, and AI grade in one side panel.</p></div>
+          </div>
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div>
+            <div><h4>Filter by pair, session, or setup tag</h4><p>Toggle London / NY / Asian to see which session is making or costing you money.</p></div>
+          </div>
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
+            <div><h4>AI pattern alerts from your calendar</h4><p>"You've lost -3.5R every Tuesday morning for the last 6 weeks." Automatic and specific.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PROP FIRM SECTION
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="propfirm" style="padding:96px 0;background:#fff">
+  <div class="container">
+    <div class="prop-inner">
+      <div class="reveal">
+        <div class="eyebrow">Prop Firm Mode</div>
+        <h2>Never breach a rule again. We track them for you.</h2>
+        <p class="lead" style="margin-bottom:28px">Set your FTMO, My Forex Funds, or True Forex Funds challenge. TradeGrid watches your daily drawdown, max drawdown, and profit target in real time — and alerts you before you even get close.</p>
+        <div class="fs-points">
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><h4>Daily & total drawdown tracker</h4><p>Real-time alert when you're within 1% of any limit. Never fail a challenge on a technicality.</p></div>
+          </div>
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><h4>FTMO, MFF, TFT, E8 — all supported</h4><p>Pre-configured challenge rules for every major prop firm. Or create your own custom rules.</p></div>
+          </div>
+          <div class="fs-point">
+            <div class="fs-point-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/></svg></div>
+            <div><h4>Multi-account dashboard</h4><p>Track all your prop firm challenges in one view. Elite plan supports unlimited accounts.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal r2">
+        <div class="prop-card">
+          <div class="prop-card-header">
+            <div class="prop-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Phase 1</div>
+            <div class="prop-account">FTMO $100,000 Challenge</div>
+            <div class="prop-sub">Started Mar 1, 2026 · 28 days remaining</div>
+          </div>
+          <div class="prop-stats">
+            <div class="prop-stat"><div class="prop-stat-label">Net P&L</div><div class="prop-stat-val" style="color:var(--green)">+$7,420</div></div>
+            <div class="prop-stat"><div class="prop-stat-label">Daily DD Used</div><div class="prop-stat-val" style="color:var(--amber)">1.2%</div></div>
+            <div class="prop-stat"><div class="prop-stat-label">Max DD Used</div><div class="prop-stat-val">2.1%</div></div>
+            <div class="prop-stat"><div class="prop-stat-label">Win Rate</div><div class="prop-stat-val" style="color:var(--green)">64%</div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-labels"><span class="progress-key">Profit Target (10%)</span><span class="progress-val" style="color:var(--green)">7.42% / 10%</span></div>
+            <div class="progress-track"><div class="progress-fill" id="pf1" style="width:0%;background:linear-gradient(90deg,var(--green),rgba(5,150,105,.4))"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-labels"><span class="progress-key">Max Daily DD (5% limit)</span><span class="progress-val" style="color:var(--amber)">1.2% used</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:24%;background:linear-gradient(90deg,var(--amber),rgba(217,119,6,.3))"></div></div>
+          </div>
+          <div class="progress-row" style="margin-bottom:0">
+            <div class="progress-labels"><span class="progress-key">Max Overall DD (10% limit)</span><span class="progress-val">2.1% used</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:21%;background:linear-gradient(90deg,var(--p500),rgba(124,58,237,.3))"></div></div>
+          </div>
+          <div style="margin-top:14px;padding:10px;background:var(--green-lo);border-radius:var(--r2);display:flex;align-items:center;gap:7px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style="font-size:.75rem;font-weight:700;color:var(--green-t)">On track — 2.58% needed to hit target</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     BROKER SYNC
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="brokers">
+  <div class="container">
+    <div class="broker-intro reveal">
+      <div class="eyebrow">Auto-Sync</div>
+      <h2>Connect your broker. Zero manual entry.</h2>
+      <p class="lead" style="max-width:520px;margin:0 auto">Trades appear in your journal the moment you close them. No copy-pasting, no CSV exports, no delays. We support 15+ of the world's most popular trading platforms.</p>
+    </div>
+    <div class="broker-logos reveal r2">
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#EFF6FF;color:#1D4ED8">MT4</div>MetaTrader 4</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#EFF6FF;color:#1D4ED8">MT5</div>MetaTrader 5</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#ECFDF5;color:#065F46">CT</div>cTrader</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#FFF7ED;color:#92400E">OA</div>OANDA</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:var(--p100);color:var(--p600)">FT</div>FTMO Export</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#F0FDF4;color:#166534">MF</div>My Forex Funds</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:#FFFBEB;color:#92400E">TV</div>TradingView</div>
+      <div class="broker-pill"><div class="broker-pill-icon" style="background:var(--bg);color:var(--muted)">CSV</div>Universal CSV</div>
+      <div class="broker-pill" style="border-color:var(--border2);color:var(--muted)">+12 more →</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="testimonials" style="background:var(--bg)">
+  <div class="container">
+    <div class="testi-intro reveal">
+      <div class="eyebrow">Social Proof</div>
+      <h2>Trusted by ambitious traders.</h2>
+      <p class="lead">Real results from real prop firm traders in our beta. No testimonials we wrote ourselves.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"TradeGrid showed me in 3 days what I couldn't figure out in 2 years of trading. I was losing all my money in the NY session and didn't know it. The AI coach literally changed my account."</p>
+        <div class="testi-author"><div class="testi-av">AK</div><div><div class="testi-name">Alex Kim</div><div class="testi-role">FTMO Funded Trader · $100K account</div></div></div>
+      </div>
+      <div class="testi-card reveal r1">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The calendar heatmap alone is worth it. I can see at a glance that XAUUSD Fridays are destroying me. Two weeks in I'm up 6R just from cutting those sessions. This is not a normal journal."</p>
+        <div class="testi-author"><div class="testi-av" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">SM</div><div><div class="testi-name">Sarah Mitchell</div><div class="testi-role">SMC Trader · My Forex Funds</div></div></div>
+      </div>
+      <div class="testi-card reveal r2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The revenge trade alert saved my FTMO challenge. I took -1R and was about to re-enter — the popup locked me for 30 minutes. Came back calm, closed +3R, passed Phase 1. AI literally saved the account."</p>
+        <div class="testi-author"><div class="testi-av" style="background:linear-gradient(135deg,#DC2626,#7C3AED)">JR</div><div><div class="testi-name">James Rivera</div><div class="testi-role">True Forex Funds · Phase 2 passed</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PRICING
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-intro reveal">
+      <div class="eyebrow">Pricing</div>
+      <h2>Choose your edge.</h2>
+      <p class="lead">Start free, upgrade when your edge is proven. We undercut every competitor by $10–$20 a month.</p>
+    </div>
+    <div class="price-grid reveal r1">
+      <!-- Free -->
+      <div class="price-card">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">$0<span class="mo">/mo</span></div>
+        <div class="price-desc">Perfect for getting started and building consistency. No credit card needed.</div>
+        <div class="price-features">
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>10 trades per month</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Manual entry only</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Basic R:R analytics</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Calendar heatmap</div>
+          <div class="pf-item off"><svg class="pf-icon off-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>AI Coach</div>
+          <div class="pf-item off"><svg class="pf-icon off-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Broker auto-sync</div>
+        </div>
+        <button class="price-btn price-btn-free" onclick="location.href='tradegrid_auth.html'">Start for Free</button>
+      </div>
+      <!-- Pro -->
+      <div class="price-card pop">
+        <div class="price-pop-badge">★ Most Popular</div>
+        <div class="price-tier">Pro</div>
+        <div class="price-amount"><sup>$</sup>19<span class="mo">/mo</span></div>
+        <div class="price-desc">Full analytics, AI coaching, and broker sync for serious traders.</div>
+        <div class="price-features">
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited trades</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>MT4 / MT5 auto-sync</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI Coach + Memory</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Voice journaling</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Prop firm mode</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>50+ analytics stats</div>
+        </div>
+        <button class="price-btn price-btn-pro" onclick="location.href='tradegrid_auth.html'">Get Pro</button>
+      </div>
+      <!-- Elite -->
+      <div class="price-card">
+        <div class="price-tier">Elite</div>
+        <div class="price-amount"><sup>$</sup>39<span class="mo">/mo</span></div>
+        <div class="price-desc">Every edge available for prop firm traders and professionals.</div>
+        <div class="price-features">
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Chart Vision AI grader</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Session replay</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mentor dashboard</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Community Edge Report</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Multi-account view</div>
+        </div>
+        <button class="price-btn price-btn-elite" onclick="location.href='tradegrid_auth.html'">Get Elite</button>
+      </div>
+      <!-- Founder -->
+      <div class="price-card founder">
+        <div class="price-tier">Founder</div>
+        <div class="price-amount"><sup>$</sup>150<span class="mo"> once</span></div>
+        <div class="price-desc">Elite access for life. One payment. Fund the AI that will coach you forever.</div>
+        <div class="price-features">
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Elite forever</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Founding member badge</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Direct roadmap input</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Private community access</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>14-day money-back</div>
+          <div class="pf-item"><svg class="pf-icon on" viewBox="0 0 24 24" fill="none" stroke="var(--p400)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>No subscription ever</div>
+        </div>
+        <button class="price-btn price-btn-founder" onclick="location.href='tradegrid_auth.html'">Claim Founder Access</button>
+      </div>
+    </div>
+    <p class="pricing-note reveal">🔒 <strong>Founder deal closes at 100 users</strong> — 73 claimed, 27 spots remaining. Goes to $39/month after launch.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FAQ
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="faq-intro reveal">
+      <div class="eyebrow">FAQ</div>
+      <h2>Questions. Answered.</h2>
+    </div>
+    <div class="faq-list" id="faq-list">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="toggleFaq(this)">What brokers does TradeGrid support?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">TradeGrid supports MT4, MT5, cTrader, OANDA, and all major prop firm CSV exports (FTMO, My Forex Funds, True Forex Funds, E8 Funding). You can also import any broker history using our Universal CSV format. We're adding new broker APIs monthly — check our <a href="#" style="color:var(--p500)">supported brokers page</a> for the full list.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach actually work?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">The AI coach uses Claude (by Anthropic) as its base model, with your entire trade history embedded into a vector database (Pinecone). When you ask a question, the AI retrieves relevant trades from your history and gives you a specific, data-backed answer — not generic advice. The more you trade, the smarter it gets. This architecture is unique to TradeGrid.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is my trading data private and secure?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">Yes. Your trade data is encrypted at rest and in transit. We use read-only API connections for broker sync — we cannot place or modify trades. Your data is never sold to third parties. The Community Edge Report uses fully anonymised, aggregated data only. You can export and delete all your data at any time.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can I use TradeGrid for prop firm challenges?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">Absolutely — prop firm traders are our core audience. TradeGrid has a dedicated Prop Firm Mode for FTMO, My Forex Funds, True Forex Funds, The Funded Trader, and E8 Funding. It tracks your daily drawdown, max drawdown, and profit target in real time, and alerts you before you breach any rules. Available on Pro and above.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What's included in the free plan?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">The free plan includes 10 trades per month, manual entry, basic R:R analytics, and the performance calendar. It's designed to let you experience the core journal and analytics before upgrading. No credit card required, and you can upgrade anytime.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What is the Founder's Lifetime Access deal?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="faq-a">The Founder's deal is a one-time $150 payment for lifetime Elite access. No subscription ever. It's limited to 100 users — 73 have been claimed. Founders get everything in Elite forever, founding member badge, direct input on the product roadmap, first access to new features, and a private community. There's a 14-day money-back guarantee.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FINAL CTA
+═══════════════════════════════════════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="eyebrow" style="color:var(--p300)">Get started</div>
+      <h2>Stop guessing why you're losing money.</h2>
+      <p>Join 2,500+ traders who use TradeGrid to find their edge, protect their challenges, and trade with real data behind every decision.</p>
+      <div class="cta-form">
+        <input class="cta-input" id="cta-email" placeholder="your@email.com">
+        <button class="btn btn-white btn-lg" onclick="joinWaitlist()">Get Started Free →</button>
+      </div>
+      <div class="cta-note">No credit card required · Free forever plan · Cancel anytime</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="nav-logo-text">TradeGrid</span>
+        <p>The AI trading journal that remembers every trade. Built for prop firm traders who want an edge that compounds.</p>
+        <div class="footer-social">
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2H3v16l4-4h14V2z"/></svg></a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <div class="footer-links">
+          <a href="#features">Journal + Analytics</a>
+          <a href="#ai-section">AI Coach</a>
+          <a href="#calendar-section">Performance Calendar</a>
+          <a href="#propfirm">Prop Firm Mode</a>
+          <a href="#features">Trade Replay</a>
+          <a href="#features">Playbooks</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Resources</div>
+        <div class="footer-links">
+          <a href="#">Blog</a>
+          <a href="#">Changelog</a>
+          <a href="#faq">Help Centre</a>
+          <a href="#">API Docs</a>
+          <a href="#brokers">Supported Brokers</a>
+          <a href="#">Free Trading Tools</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a href="#">About Us</a>
+          <a href="#">Mastr Buildr</a>
+          <a href="#">Careers</a>
+          <a href="#">Contact</a>
+          <a href="#pricing">Pricing</a>
+          <a href="tradegrid_auth.html">Sign In</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 TradeGrid · A Mastr Buildr Product · Institutional-Grade Precision for the Retail Elite.</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Risk Disclosure</a>
+        <a href="#">API Access</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════════════════════ -->
 <script>
-// CURSOR
-const c=document.getElementById('cur');
-const cd=c.querySelector('.cur-dot'),cr=c.querySelector('.cur-ring');
+/* ── CURSOR ── */
+const cur=document.getElementById('cur');
+const cd=cur.querySelector('.cur-d'),cr=cur.querySelector('.cur-r');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
-(function t(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cd.style.left=mx+'px';cd.style.top=my+'px';cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(t)})();
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cd.style.left=mx+'px';cd.style.top=my+'px';cr.style.left=rx+'px';cr.style.top=ry+'px';requestAnimationFrame(tick)})();
 
-// CALENDAR
-const calD={
-  3:{t:[{p:'NASDAQ',r:3,g:true},{p:'XAUUSD',r:6,g:true}]},
-  4:{t:[{p:'XAUUSD',r:-1,g:false},{p:'XAUUSD',r:0,be:true,lb:'BE'}]},
-  6:{t:[{p:'XAUUSD',r:-1,g:false},{p:'GBPJPY',r:4,g:true}]},
-  9:{t:[{p:'GBPJPY',r:0,be:true,lb:'BE'}]},
-  10:{t:[{p:'XAUUSD',r:-1,g:false}]},
-  11:{t:[{p:'XAUUSD',r:4,g:true},{p:'USTEC',r:-1,g:false},{p:'USTEC',r:0,be:true,lb:'ONG'}]},
-  12:{t:[{p:'USDJPY',r:-1,g:false},{p:'GBPJPY',r:-1,g:false},{p:'XAUUSD',r:-1,g:false},{p:'XAUUSD',r:-1,g:false}]},
-  16:{t:[{p:'US100',r:-1,g:false},{p:'USDJPY',r:-1,g:false}]},
-  17:{t:[{p:'GBPJPY',r:1,g:true}]},
-  18:{t:[{p:'USDJPY',r:-1,g:false},{p:'XAGUSD',r:-1,g:false},{p:'XAUUSD',r:-1,g:false}]},
-  19:{t:[{p:'US100',r:-1,g:false},{p:'USDJPY',r:0,be:true,lb:'BE'},{p:'US100',r:6,g:true}]},
-  20:{t:[{p:'XAUUSD',r:5,g:true}]}
-};
-const wks=[[1,2,3,4,5,6,7],[8,9,10,11,12,13,14],[15,16,17,18,19,20,21],[22,23,24,25,26,27,28],[29,30,31,null,null,null,null]];
-const wkTots=[11,-2,6,null];
+/* ── NAV SCROLL ── */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('scrolled',window.scrollY>20)});
 
-function buildCal(){
-  const g=document.getElementById('cal-grid');
-  wks.forEach((wk,wi)=>{
-    const row=document.createElement('div');row.className='cal-row';
-    wk.forEach(d=>{
-      const cell=document.createElement('div');
-      if(!d){cell.className='cal-cell empty';row.appendChild(cell);return;}
-      const data=calD[d];
-      const isW=wk.indexOf(d)===0||wk.indexOf(d)===6;
-      let cls='cal-cell';
-      if(isW)cls+=' wknd';
-      if(data){
-        const tot=data.t.reduce((s,t)=>s+(t.be?0:t.r),0);
-        cls+=tot>=0?' gp':' rp';
-      }
-      if(d===25)cls+=' today-c';
-      cell.className=cls;
-      const de=document.createElement('div');de.className='cal-date';de.textContent=d;cell.appendChild(de);
-      if(data){
-        data.t.slice(0,3).forEach(t=>{
-          const te=document.createElement('div');
-          te.className='cal-t '+(t.be?'be':t.g?'gp':'rp');
-          const rl=t.be?t.lb:(t.r>0?'+'+t.r+'RR':t.r+'RR');
-          te.textContent=t.p+' '+rl;cell.appendChild(te);
-        });
-      }
-      row.appendChild(cell);
-    });
-    const wt=document.createElement('div');
-    if(wi<4&&wkTots[wi]!==null){
-      const v=wkTots[wi];
-      wt.className='wk-tot '+(v>=0?'gp':'rp');
-      wt.innerHTML=`<div class="wt-v">${v>=0?'+'+v:v}RR</div><div class="wt-l">week</div>`;
-    }else{
-      wt.className='wk-tot';
-      wt.innerHTML=`<div class="wt-v" style="color:var(--muted)">—</div><div class="wt-l">week</div>`;
+/* ── MARQUEE ── */
+const mqItems=['MT4 / MT5 Auto-Sync','FTMO Challenge Mode','AI Pattern Detection','Voice Journaling','Chart Vision Grader','Revenge Trade Alerts','Session Analysis','Community Edge Report','50+ Analytics Stats','Trade Replay'];
+const mq=document.getElementById('mq');
+[...mqItems,...mqItems].forEach(t=>{const d=document.createElement('div');d.className='mq-item';d.textContent=t;mq.appendChild(d)});
+
+/* ── FEATURE TABS ── */
+document.getElementById('ftabs').querySelectorAll('.feat-tab').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.feat-tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.feat-panel').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('fp-'+this.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── MINI CALENDAR (feature tab) ── */
+function buildMiniCal(elId){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const data=[
+    ['',0,'e'],['1',2.4,'p'],['2',0,'be'],['3',-1,'n'],['4',4.2,'p'],['5',0,'e'],['6',0,'e'],
+    ['7',1.1,'p'],['8',-3.5,'n'],['9',8.4,'p'],['10',0,'be'],['11',0.5,'p'],['12',0,'e'],['13',0,'e'],
+    ['14',2.1,'p'],['15',3.8,'p'],['16',-0.8,'n'],['17',0,'be'],['18',1.2,'p'],['19',0,'e'],['20',0,'e'],
+  ];
+  data.forEach(([d,rr,t])=>{
+    const c=document.createElement('div');
+    c.className='cal-cell '+(t==='e'?'empty':t==='p'?'pos':t==='n'?'neg':'');
+    if(t!=='e'){
+      const s=rr>0?'+':rr===0?'':'';
+      c.innerHTML=`<div class="cal-date-num">${d}</div><div class="cal-rr ${t==='p'?'pos':t==='n'?'neg':'be'}">${t==='be'?'BE':s+rr+'R'}</div>${t!=='be'?`<div class="cal-bar ${t==='p'?'pos':'neg'}"></div>`:''}`;
     }
-    row.appendChild(wt);g.appendChild(row);
+    el.appendChild(c);
   });
 }
+buildMiniCal('mini-cal');
+buildMiniCal('main-cal');
 
-// TRADE TABLE
-const trades=[
-  {p:'XAUUSD',d:'SELL',dt:'Mar 20',s:'London',r:'+5R',g:'A+',gc:'ga',e:'😌 Calm',n:'Perfect OB entry'},
-  {p:'US100',d:'BUY',dt:'Mar 19',s:'NY',r:'+6R',g:'A+',gc:'ga',e:'😌 Calm',n:'SMC BOS confirmed'},
-  {p:'GBPJPY',d:'BUY',dt:'Mar 17',s:'London',r:'+1R',g:'B',gc:'gb',e:'😤 FOMO',n:'Entry slightly early'},
-  {p:'XAUUSD',d:'BUY',dt:'Mar 11',s:'London',r:'+4R',g:'A+',gc:'ga',e:'😌 Calm',n:'Textbook setup'},
-  {p:'USDJPY',d:'SELL',dt:'Mar 12',s:'NY',r:'-1R',g:'C',gc:'gc',e:'😰 Fear',n:'Moved SL too early'},
-  {p:'XAUUSD',d:'SELL',dt:'Mar 6',s:'London',r:'-1R',g:'B',gc:'gb',e:'😌 Calm',n:'News spike SL hit'},
-  {p:'NASDAQ',d:'BUY',dt:'Mar 3',s:'NY',r:'+3R',g:'A+',gc:'ga',e:'😎 Confident',n:'Clean breakout'},
-];
-function buildTbl(){
-  const tb=document.getElementById('tbl');
-  trades.forEach(t=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td><span class="pbadge">${t.p}</span></td><td><span class="dbadge ${t.d==='BUY'?'b':'s'}">${t.d}</span></td><td style="color:var(--muted);font-size:.68rem">${t.dt}</td><td style="color:var(--muted);font-size:.68rem">${t.s}</td><td style="color:${t.r.startsWith('+')?'var(--green)':'var(--red)'};font-weight:600">${t.r}</td><td><span class="grade ${t.gc}">${t.g}</span></td><td style="font-size:.68rem">${t.e}</td><td style="color:var(--muted);font-size:.65rem;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.n}</td>`;
-    tb.appendChild(tr);
-  });
+/* ── SCROLL REVEAL ── */
+const revObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+/* ── PROP FIRM PROGRESS BAR ── */
+const pfObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){document.getElementById('pf1').style.width='74.2%';pfObs.disconnect()}});
+},{threshold:.5});
+const pf1=document.getElementById('pf1');
+if(pf1)pfObs.observe(pf1);
+
+/* ── FAQ ── */
+function toggleFaq(qEl){
+  const item=qEl.parentElement;
+  const wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!wasOpen)item.classList.add('open');
 }
 
-// PAIRS
-const pairsData=[
-  {n:'XAUUSD',r:'+11R',g:true,p:85},{n:'GBPJPY',r:'+4R',g:true,p:60},
-  {n:'US100',r:'+5R',g:true,p:55},{n:'NASDAQ',r:'+3R',g:true,p:40},
-  {n:'USDJPY',r:'-3R',g:false,p:38},{n:'USTEC',r:'-1R',g:false,p:15},
-];
-function buildPairs(){
-  const el=document.getElementById('pairs');
-  pairsData.forEach(p=>{
-    const r=document.createElement('div');r.className='pr-row';
-    r.innerHTML=`<div class="pr-nm">${p.n}</div><div class="pr-bg"><div class="pr-fill ${p.g?'gp':'rp'}" data-w="${p.p}" style="width:0%"></div></div><div class="pr-rr ${p.g?'gp':'rp'}">${p.r}</div>`;
-    el.appendChild(r);
-  });
-  setTimeout(()=>{document.querySelectorAll('.pr-fill').forEach(b=>{b.style.width=b.dataset.w+'%'})},400);
+/* ── CTA ── */
+function joinWaitlist(){
+  const inp=document.getElementById('cta-email');
+  const v=inp.value.trim();
+  if(!v||!v.includes('@')){inp.style.borderColor='rgba(239,68,68,.5)';setTimeout(()=>inp.style.borderColor='',1500);return;}
+  const btn=inp.nextElementSibling;
+  btn.textContent='✓ You\'re on the list!';
+  btn.style.background='#F0FDF4';
+  btn.style.color='#065F46';
+  inp.value='';inp.placeholder='See you inside 🚀';inp.disabled=true;
 }
 
-// EQUITY CURVE
-function drawEq(){
-  const cv=document.getElementById('eq');
-  cv.width=cv.parentElement.offsetWidth;cv.height=65;
-  const ctx=cv.getContext('2d');
-  const pts=[0,-2,-1,2,4,3,5,4,8,7,6,8,9,11,10,12,11,13,15];
-  const W=cv.width,H=65,pad=4;
-  const mn=Math.min(...pts),mx2=Math.max(...pts);
-  const sy=v=>H-pad-((v-mn)/(mx2-mn))*(H-pad*2);
-  const sx=i=>pad+i*(W-pad*2)/(pts.length-1);
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'rgba(0,212,232,.22)');g.addColorStop(1,'rgba(0,212,232,0)');
-  ctx.beginPath();ctx.moveTo(sx(0),sy(pts[0]));
-  pts.forEach((v,i)=>{if(i>0)ctx.lineTo(sx(i),sy(v))});
-  ctx.lineTo(sx(pts.length-1),H);ctx.lineTo(sx(0),H);ctx.closePath();
-  ctx.fillStyle=g;ctx.fill();
-  ctx.beginPath();ctx.moveTo(sx(0),sy(pts[0]));
-  pts.forEach((v,i)=>{if(i>0)ctx.lineTo(sx(i),sy(v))});
-  ctx.strokeStyle='#00d4e8';ctx.lineWidth=2;ctx.stroke();
-  ctx.beginPath();ctx.arc(sx(pts.length-1),sy(pts[pts.length-1]),4,0,Math.PI*2);
-  ctx.fillStyle='#00d4e8';ctx.fill();
-}
+/* ── CAL TABS ── */
+document.querySelectorAll('.cal-tab').forEach(t=>{t.addEventListener('click',function(){[...this.parentElement.children].forEach(b=>b.classList.remove('on'));this.classList.add('on')})});
 
-// COUNTERS
-function cnt(el,end,sfx,dec=0,dur=1100){
-  const s=performance.now();
-  (function t(ts){
-    const p=Math.min((ts-s)/dur,1);
-    const e=1-Math.pow(1-p,4);
-    el.textContent=(dec?(end*e).toFixed(dec):Math.round(end*e))+sfx;
-    if(p<1)requestAnimationFrame(t);else el.textContent=(dec?end.toFixed(dec):end)+sfx;
-  })(performance.now());
-}
-
-// AI CHAT
-const aiR={
-  default:'Based on your 47 trades this month, your main issue on Wednesday was NY session volatility — XAUUSD had irregular spreads after the FOMC minutes. Your entries were technically valid (B-grade) but news-driven wicks are hitting your SLs. My fix: avoid XAUUSD 30 mins around USD high-impact news.',
-  'my worst pairs':'Your worst pair this month is USDJPY: -3R across 4 trades, 25% win rate vs your 62% average. Pattern: you enter USDJPY during NY overlaps where your edge is weakest. Consider removing it from your watchlist for the rest of the challenge.',
-  'grade my week':'Week of Mar 16–20 grade: B+. 6 trades, 4 A+ setups, 2 B-grade. Discipline improved — only 1 emotional entry vs 3 the week before. The +6R result shows what\'s possible when you stay selective. Focus: cut the B-grade entries entirely.',
-  'am i revenge trading?':'Checking... You had 2 potential revenge trades this month (Mar 12 — re-entered 8 mins after a -1R USDJPY loss). That session cost -2R total. Your average re-entry window after losses is 22 mins; healthy threshold is 30+ mins. I\'ll alert you next time I detect rapid re-entry.',
-  'best session for me':'London open (07:00–10:00 GMT) is your clear edge: 74% win rate, avg 2.8R per trade. Your top 5 trades this month all happened there. NY session drops you to 51%. Recommendation: go London-only for XAUUSD and GBPJPY setups this week.'
-};
-let tId;
-function addMsg(txt,who){
-  const box=document.getElementById('msgs');
-  const typer=document.getElementById('typer');if(typer)typer.remove();
-  const d=document.createElement('div');d.className='msg '+who;
-  const now=new Date().toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'});
-  d.innerHTML=`<div class="mb">${txt}</div><div class="mt">${now}</div>`;
-  box.appendChild(d);box.scrollTop=box.scrollHeight;
-}
-function showAI(txt){
-  const box=document.getElementById('msgs');
-  const te=document.createElement('div');te.className='msg ai';te.id='typer';
-  te.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
-  box.appendChild(te);box.scrollTop=box.scrollHeight;
-  clearTimeout(tId);
-  tId=setTimeout(()=>{te.remove();addMsg(txt,'ai')},1700);
-}
-function sendMsg(){
-  const inp=document.getElementById('ai-in');const v=inp.value.trim();if(!v)return;
-  addMsg(v,'usr');inp.value='';
-  const k=v.toLowerCase().replace(/[^a-z? ]/g,'').trim();
-  showAI(aiR[k]||aiR['default']);
-}
-function sendQ(btn){addMsg(btn.textContent,'usr');showAI(aiR[btn.textContent.toLowerCase()]||aiR['default'])}
-
-// MODAL
-function openM(){document.getElementById('mov').classList.add('open')}
-function closeM(){document.getElementById('mov').classList.remove('open')}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
-function subTrade(){closeM();addMsg("Just logged a new trade — what's my grade?",'usr');showAI("Trade graded: A+. Your entry aligns with your strongest historical pattern — XAUUSD London open with SMC confluence. One note: this is your 3rd trade today, which historically reduces your win rate by ~12%. Protect your open P&L. 🎯")}
-document.querySelectorAll('.ebo').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.ebo').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
-document.querySelectorAll('.ctrl-grp .cbtn').forEach(b=>b.addEventListener('click',function(){[...this.parentElement.children].forEach(x=>x.classList.remove('on'));this.classList.add('on')}));
-
-// INIT
-buildCal();buildTbl();buildPairs();drawEq();
-window.addEventListener('resize',drawEq);
-setTimeout(()=>{
-  cnt(document.getElementById('c1'),23,'');
-  cnt(document.getElementById('c2'),2.4,'R',1);
-  cnt(document.getElementById('c3'),2.1,'x',1);
-  cnt(document.getElementById('c4'),3.8,'%',1);
-  setTimeout(()=>{document.getElementById('c5').textContent='A / B+'},700);
-  document.getElementById('ftmo-tb').style.width='75%';
-  document.getElementById('pb1').style.width='75%';
-},200);
-setTimeout(()=>{showAI(aiR['default'])},1000);
+/* ── WAVEBAR ANIMATION ── */
+const style=document.createElement('style');
+style.textContent='@keyframes wavebar{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1)}}';
+document.head.appendChild(style);
 </script>
 </body>
 </html>
